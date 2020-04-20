@@ -1,7 +1,7 @@
 version: '2'
 services:
   zookeeper:
-    image: ./zookeeper
+    build: ./zookeeper
     ports:
       - "2181:2181"
   kafka:
