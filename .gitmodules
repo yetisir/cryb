@@ -1,0 +1,6 @@
+[submodule "server/kafka"]
+	path = server/kafka
+	url = https://github.com/wurstmeister/kafka-docker
+[submodule "server/zookeeper"]
+	path = server/zookeeper
+	url = https://github.com/wurstmeister/zookeeper-docker
