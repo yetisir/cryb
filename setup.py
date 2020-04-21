@@ -15,12 +15,13 @@ setup(
 #    packages=find_namespace_packages(
 #        include=['data.*', 'geometry.*', 'modelling.*', 'plot.*']),
     install_requires=[
+        'scrapy',
  #         'sphinx',
  #         'sphinx_rtd_theme',
-          'pytest',
-          'pytest-flakes',
+#          'pytest',
+ #         'pytest-flakes',
   #        'pyyaml',
-          'configurator',
+  #        'configurator',
   #        'tqdm',
   #        'pandas',
   #        'sqlalchemy',
