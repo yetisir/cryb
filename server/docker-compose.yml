@@ -35,7 +35,7 @@ services:
     environment:
       - 'ALLOW_EMPTY_PASSWORD=yes'
   redis:
-    image: 'bitnami/redis:5'
+    image: 'bitnami/redis:5.0'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
