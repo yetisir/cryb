@@ -13,6 +13,8 @@ setup(
     license='GNU GPL v3.0',
     install_requires=[
         'scrapy',
+        'pytest',
+        'pytest-flakes',
     ],
     zip_safe=False,
     entry_points={
