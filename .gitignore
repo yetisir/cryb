@@ -1,8 +1,12 @@
 # Python
 *.pyc
+*.egg-info/
 
 # VSCode
 .vscode/
 
 # Pytest
 tests/test-reports
+
+# Vim
+*.swp
