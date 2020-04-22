@@ -1,2 +1,8 @@
+# Python
 *.pyc
 
+# VSCode
+.vscode/
+
+# Pytest
+tests/test-reports
