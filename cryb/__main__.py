@@ -3,6 +3,7 @@ import argparse
 
 from . import server, crawl, test
 
+
 def main(args=None):
     # allow main function to be called from cli or programmatically
     if args is None:
@@ -18,7 +19,7 @@ def main(args=None):
         crawl.CrawlEntryPoint(),
         test.TestEntryPoint(),
     ]
-    
+
     # map entry point name to entry point object for easier access
     entry_point_map = {
             entry_point.name: entry_point for entry_point in entry_points}
@@ -33,7 +34,6 @@ def main(args=None):
 
     # run the specified entry point
     entry_point = entry_point_map.get(parameters.entry_point)
-    import pdb; pdb.set_trace()
     entry_point.run(parameters)
 
 

@@ -16,5 +16,6 @@ class TestEntryPoint(common.EntryPoint):
     def build_parser(self, parser):
         pass
 
+
 if __name__ == '__main__':
     TestEntryPoint.main()

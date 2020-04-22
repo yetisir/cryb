@@ -52,9 +52,9 @@ SPIDER_MIDDLEWARES = {
     (
         'frontera.contrib.scrapy.middlewares.'
         'schedulers.SchedulerSpiderMiddleware'): 999,
-    (
-        'frontera.contrib.scrapy.middlewares.'
-        'seeds.file.FileSeedLoader'): 1
+#    (
+#        'frontera.contrib.scrapy.middlewares.'
+#        'seeds.file.FileSeedLoader'): 1
 
 }
 
@@ -68,7 +68,7 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Frontera scheduler
 SCHEDULER = 'frontera.contrib.scrapy.schedulers.frontier.FronteraScheduler'
-FRONTERA_SETTINGS = 'crawl.frontera.spiders'
+FRONTERA_SETTINGS = 'crawl.frontera.settings'
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
