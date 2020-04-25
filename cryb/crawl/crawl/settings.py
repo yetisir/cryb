@@ -54,7 +54,7 @@ SPIDER_MIDDLEWARES = {
         'schedulers.SchedulerSpiderMiddleware'): 999,
 #    (
 #        'frontera.contrib.scrapy.middlewares.'
-#        'seeds.file.FileSeedLoader'): 1
+#        'seeds.file.FileSeedLoader'): 1,
 
 }
 
