@@ -13,7 +13,8 @@ class CrawlEntryPoint(common.EntryPoint):
         #frontera = LocalFrontierManager.from_settings(settings)
 
         crawler = CrawlerProcess(get_project_settings())
-        crawler.crawl(parameters.spider)
+        spider = crawler.spider_loader.load(parameters.spider)
+        crawler.crawl(spider)
 
     def build_parser(self, parser):
         parser.add_argument('spider')

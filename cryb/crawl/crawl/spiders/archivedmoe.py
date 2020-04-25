@@ -2,7 +2,6 @@ from scrapy import Spider
 from crawl.items import Thread, Comment
 from datetime import datetime
 from scrapy.utils.project import get_project_settings
-import pymongo
 import json
 from json import JSONDecodeError
 
@@ -137,20 +136,3 @@ class ArchivedMoeSpider(Spider):
         item['thread'] = comment['thread_num']
 
         return item
-
-    def open_mongodb(self):
-        self.client = pymongo.MongoClient(
-            host=settings.get('MONGO_HOST'),
-            port=settings.get('MONGO_PORT'),
-            username=settings.get('MONGO_USERNAME'),
-            password=settings.get('MONGO_PASSWORD'),
-            authSource=settings.get('MONGO_AUTHORIZATION_DATABASE'),
-        )
-
-        self.db = self.client[self.target_database]
-
-    def close_mongodb(self):
-        try:
-            self.client.close()
-        except AttributeError:
-            pass

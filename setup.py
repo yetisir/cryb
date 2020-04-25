@@ -14,7 +14,8 @@ setup(
     install_requires=[
         'scrapy',
         'pytest',
-        'pytest-flakes',
+        'pytest-flake8',
+        'frontera[distributed,kafka,sql]',
     ],
     zip_safe=False,
     entry_points={
