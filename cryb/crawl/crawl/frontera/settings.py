@@ -16,3 +16,5 @@ SPIDER_LOG_PARTITIONS = 1  # worker instances
 #        'frontera.utils.fingerprint.hostname_local_fingerprint')
 
 BACKEND = 'frontera.contrib.backends.sqlalchemy.Distributed'
+
+CRAWLING_STRATEGY = 'fourchan_strategy'
