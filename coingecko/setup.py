@@ -12,8 +12,10 @@ setup(
     author_email='yetisir@gmail.com',
     license='GNU GPL v3.0',
     install_requires=[
-        'scrapy',
         'pycoingecko',
+        'sqlalchemy',
+        'marshmallow',
+        'marshmallow_sqlalchemy',
     ],
     zip_safe=False,
 )

@@ -22,7 +22,7 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: borehole_database
+      POSTGRES_DB: coingecko 
       POSTGRES_PORT: 5432
       POSTGRES_HOST: postgres
     restart: always
