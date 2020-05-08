@@ -1,4 +1,22 @@
-class Coin(sql.Model):
+import sqlalchemy as sql
+from sqlalchemy.ext import declarative
+from sqlalchemy.orm import relationship
+import marshmallow_sqlalchemy as ma
+
+import config
+
+
+def schema_metadata(cls):
+    class Meta:
+        model = cls
+        load_instance=True
+        sqla_session = sql.session
+        include_fk = True
+        include_relationships = True
+    return Meta
+
+
+class Coin(config.Base):
     __tablename__ = 'coin'
 
     id = sql.Column(sql.String(32), primary_key=True)
@@ -13,7 +31,11 @@ class Coin(sql.Model):
     telegram = sql.Column(sql.String(128))
 
 
-class CoinSocialData(sql.Model):
+class CoinSchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(Coin)
+
+
+class CoinSocialData(config.Base):
     __tablename__ = 'coin_social_data'
 
     timestamp = sql.Column(sql.Date(), primary_key=True)
@@ -26,7 +48,11 @@ class CoinSocialData(sql.Model):
     reddit_accounts_active_48h = sql.Column(sql.Integer(), nullable=False)
 
 
-class CoinDeveloperData(sql.Model):
+class CoinSocialDataSchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(CoinSocialData)
+
+
+class CoinDeveloperData(config.Base):
     __tablename__ = 'coin_developer_data'
 
     timestamp = sql.Column(sql.Date(), primary_key=True)
@@ -42,7 +68,12 @@ class CoinDeveloperData(sql.Model):
     code_deletions_4_weeks = sql.Column(sql.Integer(), nullable=False)
     commit_count_4_weeks = sql.Column(sql.Integer(), nullable=False)
 
-class CoinPublicInterestData(sql.Model):
+
+class CoinDeveloperDataSchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(CoinDeveloperData)
+
+
+class CoinPublicInterestData(config.Base):
     __tablename__ = 'coin_public_interest_data'
 
     timestamp = sql.Column(sql.Date(), primary_key=True)
@@ -51,7 +82,11 @@ class CoinPublicInterestData(sql.Model):
     bing_matches = sql.Column(sql.Integer(), nullable=False)
 
 
-class CoinMarketData(sql.Model):
+class CoinPublicInterestDataSchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(CoinPublicInterestData)
+
+
+class CoinMarketData(config.Base):
     __tablename__ = 'coin_market_data'
 
     timestamp = sql.Column(sql.Date(), primary_key=True)
@@ -59,3 +94,5 @@ class CoinMarketData(sql.Model):
     price_usd = sql.Column(sql.Float, nullable=False)
 
 
+class CoinMarketDataSchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(CoinMarketData)
