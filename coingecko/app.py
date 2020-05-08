@@ -10,7 +10,7 @@ def main():
 
     # initialization loop just incase this server initializes before postgres
     try:
-        config.BaseTable.metadata.create_all()
+        config.Base.metadata.create_all(config.db_engine)
     except OperationalError:
         logging.error('Unable to connect to database. Trying again ...')
         time.sleep(1)

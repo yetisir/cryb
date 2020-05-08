@@ -12,6 +12,7 @@ setup(
     author_email='yetisir@gmail.com',
     license='GNU GPL v3.0',
     install_requires=[
+        'psycopg2-binary',
         'pycoingecko',
         'sqlalchemy',
         'marshmallow',

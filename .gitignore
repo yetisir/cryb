@@ -10,3 +10,7 @@ tests/test-reports
 
 # Vim
 *.swp
+
+# SQLite
+
+*.sqlite
