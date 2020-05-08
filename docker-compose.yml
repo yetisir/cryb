@@ -7,7 +7,6 @@ services:
       - 5432:5432
     volumes:
       - postgres:/var/lib/postgres
-      - postgres_binary:/var/lib/postgres_binary
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -15,12 +14,11 @@ services:
     restart: always
 
   coingecko:
-    build: ./coingeck
+    build: ./coingecko
     ports:
       - 5001:5001
     volumes:
-      - ./rest:/app # for debug mode - not neccessary for production
-      - postgres_binary:/var/lib/postgres_binary
+      - ./coingecko:/app # for debug mode - not neccessary for production
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -33,6 +31,4 @@ services:
 
 volumes:
   postgres:
-    driver: local
-  postgres_binary:
     driver: local

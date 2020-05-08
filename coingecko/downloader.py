@@ -1,3 +1,5 @@
+import time
+
 import pycoingecko
 
 import tables, config
@@ -26,4 +28,4 @@ class CoinGecko:
             coin = schema.load(coin_data)
 
             config.session.add(coin)
-
+            time.sleep(1)
