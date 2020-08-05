@@ -19,7 +19,7 @@ def main():
         exit()
 
     coin_gecko = downloader.CoinGecko()
-    coin_gecko.get_coin_info()
-
+    #coin_gecko.get_coin_info()
+    coin_gecko.get_all_coin_history()
 if __name__ == '__main__':
     main()

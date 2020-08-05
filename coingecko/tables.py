@@ -43,10 +43,10 @@ class CoinSocialData(config.Base):
     coin_id = sql.Column(sql.String(), sql.ForeignKey('coin.id'), primary_key=True)
     facebook_likes = sql.Column(sql.Integer(), nullable=False)
     twitter_followers = sql.Column(sql.Integer(), nullable=False)
-    reddit_average_posts_48h = sql.Column(sql.Integer(), nullable=False)
-    reddit_avergage_comments_48h = sql.Column(sql.Integer(), nullable=False)
+    reddit_average_posts_48h = sql.Column(sql.Float(), nullable=False)
+    reddit_avergage_comments_48h = sql.Column(sql.Float(), nullable=False)
     reddit_subscribers = sql.Column(sql.Integer(), nullable=False)
-    reddit_accounts_active_48h = sql.Column(sql.Integer(), nullable=False)
+    reddit_accounts_active_48h = sql.Column(sql.Float(), nullable=False)
 
 
 class CoinSocialDataSchema(ma.SQLAlchemyAutoSchema):
@@ -65,9 +65,9 @@ class CoinDeveloperData(config.Base):
     closed_issues = sql.Column(sql.Integer(), nullable=False)
     pull_requests_merged = sql.Column(sql.Integer(), nullable=False)
     pull_request_contributors = sql.Column(sql.Integer(), nullable=False)
-    code_additions_4_weeks = sql.Column(sql.Integer(), nullable=False)
-    code_deletions_4_weeks = sql.Column(sql.Integer(), nullable=False)
-    commit_count_4_weeks = sql.Column(sql.Integer(), nullable=False)
+    code_additions_4_weeks = sql.Column(sql.Float(), nullable=False)
+    code_deletions_4_weeks = sql.Column(sql.Float(), nullable=False)
+    commit_count_4_weeks = sql.Column(sql.Float(), nullable=False)
 
 
 class CoinDeveloperDataSchema(ma.SQLAlchemyAutoSchema):
