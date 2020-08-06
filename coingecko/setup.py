@@ -17,6 +17,7 @@ setup(
         'sqlalchemy',
         'marshmallow',
         'marshmallow_sqlalchemy',
+        'pyyaml',
     ],
     zip_safe=False,
 )

@@ -4,6 +4,7 @@ import pycoingecko
 import sqlalchemy
 from sqlalchemy.ext import declarative
 from sqlalchemy.orm import sessionmaker
+import yaml
 
 import os
 
@@ -30,4 +31,10 @@ Session = sessionmaker(bind=db_engine)
 db_session = Session()
 Base = declarative.declarative_base()
 
+metadata = Base.metadata
+metadata.bind = db_engine
+
 coin_gecko = pycoingecko.CoinGeckoAPI()
+
+with open('settings.yml', 'r') as settings_file:
+    settings = yaml.safe_load(settings_file)
