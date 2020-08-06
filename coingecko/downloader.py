@@ -16,7 +16,7 @@ class Coins:
     async def get_coins(self):
         coin_list = await self.coin_list()
         asyncio.gather(*map(self.get_coin, coin_list))
-        # async for coin in self.coin_list():
+        # for coin in coin_list:
         #     coin_id = coin['id']
         #     # temp
         #     if coin_id not in config.settings['coin_ids']:
@@ -31,18 +31,13 @@ class Coins:
         # temp
         if coin_id not in config.settings['coin_ids']:
             return
-
-        print(coin_id, 1)
-
         coin = Coin(coin_id)
         # await coin.get_info()
-        print(coin_id, 2)
-        await coin.get_history()
-        print(coin_id, 2)
+        loop = asyncio.get_event_loop()
+        loop.create_task(coin.get_history())
 
     async def coin_list(self):
         response = await apirequests.add('get_coins_list')
-
         return [coin['id'] for coin in response]
 
 
@@ -56,7 +51,6 @@ class Coin:
         self.raw_info = None
 
     async def get_history(self):
-        print(self.coin_id)
         self.history = CoinHistory(self.coin_id)
         await self.history.query()
 

@@ -4,7 +4,6 @@ from functools import wraps
 import hashlib
 import pickle
 import json
-import asyncio
 
 
 def cache(path=None, ignore_self=False):
@@ -25,6 +24,7 @@ def cache(path=None, ignore_self=False):
             os.makedirs(path)
             cache_hashes = []
 
+        @wraps(function)
         def wrapper(*args, **kwargs):
             args_hash = json_hash({
                 'args': args if not ignore_self else args[1:],
@@ -45,20 +45,7 @@ def cache(path=None, ignore_self=False):
             with open(cache_file_path, 'wb') as cache_file:
                 pickle.dump(result, cache_file)
             return result
-
-        @wraps(function)
-        def sync_wrapper(*args, **kwargs):
-            return wrapper(*args, **kwargs)
-
-        @wraps(function)
-        async def async_wrapper(*args, **kwargs):
-            return wrapper(*args, **kwargs)
-
-        if asyncio.iscoroutinefunction(function):
-            return async_wrapper
-        else:
-            return sync_wrapper
-
+        return wrapper
     return decorator
 
 

@@ -1,49 +1,50 @@
 import asyncio
 import datetime
 import time
+import functools
+import logging
 
 import pycoingecko
 
 import utils
 import config
 
-# TODO: handle globals better
-api = pycoingecko.CoinGeckoAPI()
-queue = asyncio.Queue()
-jobs = {}
 
+class Queue(asyncio.Queue):
+    calls = []
 
-class Timer():
     def __init__(self, request_delay=None):
-        self.last_request = datetime.datetime.fromtimestamp(0)
-        self.lock = False
+
+        super().__init__()
+        self.last_request = time.time()
+        self.lock = asyncio.Lock()
 
         if request_delay is None:
             request_delay = config.settings['request_delay']
         self.request_delay = request_delay
 
-    def limit_rate(self, worker):
-        return
-        # print(self.lock, worker)
-        # if not self.lock:
-        #     self.lock = worker
-        #     if self.lock == worker:
-        now = datetime.datetime.utcnow()
-        request_diff = now - self.last_request
-        self.last_request = datetime.datetime.utcnow()
-        if request_diff < datetime.timedelta(self.request_delay):
-            time.sleep(request_diff)
-        #         self.lock = False
+    async def get(self):
+        item = await super().get()
+        async with self.lock:
+            request_diff = (time.time() - self.last_request)
 
-        #     else:
-        #         self.lock = False
-        #         self.limit_rate(worker)
-        # else:
-        #     self.lock = False
-        #     self.limit_rate(worker)
+            if request_diff < self.request_delay:
+                await asyncio.sleep(self.request_delay - request_diff)
+
+            self.last_request = time.time()
+
+        now = time.time()
+        self.calls.append(now)
+        self.calls = [call for call in self.calls if (now - call) < 1]
+        rate = len(self.calls)
+        logging.info(f'API access rate: {rate}/s')
+        return item
 
 
-timer = Timer()
+# TODO: handle globals better
+api = pycoingecko.CoinGeckoAPI()
+queue = Queue()
+jobs = {}
 
 
 async def add(method_name, *args, attempt=1, **kwargs):
@@ -61,29 +62,25 @@ async def add(method_name, *args, attempt=1, **kwargs):
         'event': asyncio.Event(),
         'response': None,
     }
-
-    print('add', method_name, queue.qsize())
     await jobs[item['id']]['event'].wait()
 
     return jobs[item['id']]['response']
 
 
-# @utils.cache()
-async def api_request(method_name, *args, **kwargs):
+@utils.cache()
+def api_request(method_name, *args, **kwargs):
     method = getattr(api, method_name)
     return method(*args, **kwargs)
 
 
 async def worker(name):
     while True:
-        print(name, queue.qsize())
-
         request = await queue.get()
-        print(name, 'after', queue.qsize())
-        timer.limit_rate(name)
 
-        response = await api_request(request['method_name'], *request['args'], **request['kwargs'])
-        print(name, 'after1')
+        loop = asyncio.get_event_loop()
+        partial = functools.partial(
+            api_request, request['method_name'], *request['args'], **request['kwargs'])
+        response = await loop.run_in_executor(None, partial)
 
         if response is None and request['attempt'] <= config.settings['max_retries']:
             loop = asyncio.get_event_loop()
@@ -100,11 +97,11 @@ async def worker(name):
 async def run():
     tasks = []
     for i in range(config.settings['concurrent_requests']):
-        loop = asyncio.get_event_loop()
-        task = loop.create_task(worker(f'worker-{i}'))
-        tasks.append(task)
+        tasks.append(worker(f'worker-{i}'))
 
-    await queue.join()
+    asyncio.gather(*tasks)
+
+    # await queue.join()
     # print('test3')
 
     # for task in tasks:

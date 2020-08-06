@@ -21,8 +21,6 @@ def main():
     except KeyboardInterrupt:
         exit()
 
-    loop = asyncio.get_event_loop()
-
     coin_gecko = downloader.Coins()
 
     loop = asyncio.get_event_loop()
