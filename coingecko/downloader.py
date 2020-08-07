@@ -32,7 +32,7 @@ class Coins:
         if coin_id not in config.settings['coin_ids']:
             return
         coin = Coin(coin_id)
-        # await coin.get_info()
+        await coin.get_info()
         loop = asyncio.get_event_loop()
         loop.create_task(coin.get_history())
 
@@ -55,7 +55,6 @@ class Coin:
         await self.history.query()
 
     async def get_info(self):
-        logging.info(f'Downloading {self.coin_id} metadata ...')
         self.raw_info = await apirequests.add(
             'get_coin_by_id',
             self.coin_id,
@@ -66,6 +65,7 @@ class Coin:
             developer_data=False,
             sparkline=False)
 
+        logging.info(f'Downloaded {self.coin_id} metadata ...')
         self.save()
 
     def save(self):
@@ -171,7 +171,7 @@ class CoinHistory:
             coin_snapshot = CoinHistorySnapshot(self.coin_id, date)
             await coin_snapshot.query()
 
-            if not coin_snapshot.valid_data:
+            if not coin_snapshot.valid_data and date != datetime.datetime.utcnow().date():
                 break
             if self.smart_scan and date < max_date:
                 break
@@ -220,14 +220,14 @@ class CoinHistorySnapshot:
         return self.date.strftime('%d-%m-%Y')
 
     async def query(self):
-        logging.info(
-            f'Downloading {self.coin_id} data for {self.date_str} ...')
         self.raw_data = await apirequests.add(
             'get_coin_history_by_id',
             id=self.coin_id,
             date=self.date_str,
             localization=False,
         )
+        logging.info(
+            f'Downloaded {self.coin_id} data for {self.date_str} ...')
         self.save()
 
     def save(self):

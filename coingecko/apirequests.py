@@ -3,6 +3,7 @@ import datetime
 import time
 import functools
 import logging
+import requests
 
 import pycoingecko
 
@@ -13,18 +14,27 @@ import config
 class Queue(asyncio.Queue):
     calls = []
 
-    def __init__(self, request_delay=None):
+    def __init__(self):
 
         super().__init__()
         self.last_request = time.time()
         self.lock = asyncio.Lock()
 
-        if request_delay is None:
-            request_delay = config.settings['request_delay']
-        self.request_delay = request_delay
+        self.rate_limit = config.settings['rate_limit']
+        self.rate_timeframe = config.settings['rate_timeframe']
+        self.request_delay = self.rate_timeframe / self.rate_limit
 
     async def get(self):
-        item = await super().get()
+        request = await super().get()
+
+        cache_request = {
+            'args': (request['method_name'], ) + request['args'],
+            'kwargs': request['kwargs']
+        }
+
+        if utils.in_cache(cache_request):
+            return request
+
         async with self.lock:
             request_diff = (time.time() - self.last_request)
 
@@ -35,10 +45,15 @@ class Queue(asyncio.Queue):
 
         now = time.time()
         self.calls.append(now)
-        self.calls = [call for call in self.calls if (now - call) < 1]
-        rate = len(self.calls)
-        logging.info(f'API access rate: {rate}/s')
-        return item
+        self.calls = [call for call in self.calls if (
+            now - call) < self.rate_timeframe]
+        rate = (
+            len(self.calls) /
+            (time.time() - self.calls[0]) * self.rate_timeframe
+        )
+        logging.info(
+            f'API access rate: {rate} requests/{self.rate_timeframe}s')
+        return request
 
 
 # TODO: handle globals better
@@ -80,18 +95,21 @@ async def worker(name):
         loop = asyncio.get_event_loop()
         partial = functools.partial(
             api_request, request['method_name'], *request['args'], **request['kwargs'])
+
+        # try:
         response = await loop.run_in_executor(None, partial)
-
-        if response is None and request['attempt'] <= config.settings['max_retries']:
-            loop = asyncio.get_event_loop()
-            loop.create_task(
-                add(request['method_name'], request['attempt'] +
-                    1, *request['args'], **request['kwargs']))
-        else:
-            jobs[request['id']]['response'] = response
-            jobs[request['id']]['event'].set()
-
-        # queue.task_done()
+        jobs[request['id']]['response'] = response
+        jobs[request['id']]['event'].set()
+        # except requests.exceptions.HTTPError:
+        #     if request['attempt'] <= config.settings['max_retries']:
+        #         logging.info('HTTPError, waiting 5 seconds to retry:')
+        #         queue.
+        #         loop = asyncio.get_event_loop()
+        #         loop.create_task(add(
+        #             request['method_name'],
+        #             *request['args'],
+        #             attempt=request['attempt'] + 1,
+        #             **request['kwargs']))
 
 
 async def run():
@@ -100,16 +118,6 @@ async def run():
         tasks.append(worker(f'worker-{i}'))
 
     asyncio.gather(*tasks)
-
-    # await queue.join()
-    # print('test3')
-
-    # for task in tasks:
-    #     print('test5')
-    #     task.cancel()
-
-    # await asyncio.gather(*tasks, return_exceptions=True)
-
 
 # async def request(method_name, *args, **kwargs):
 #     method=getattr(self.api, method_name)

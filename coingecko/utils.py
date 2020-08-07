@@ -9,10 +9,7 @@ import json
 def cache(path=None, ignore_self=False):
     """Decorator to cache the results of large queries to a serialized file"""
 
-    if path is None:
-        path = pathlib.Path(os.getcwd()) / 'cache'
-    else:
-        path = pathlib.Path(path)
+    path = cache_path(path)
 
     def decorator(function):
         # TODO: migrate to redis
@@ -47,6 +44,20 @@ def cache(path=None, ignore_self=False):
             return result
         return wrapper
     return decorator
+
+
+def cache_path(path=None):
+    if path is None:
+        return pathlib.Path(os.getcwd()) / 'cache'
+    else:
+        return pathlib.Path(path)
+
+
+def in_cache(json_args, path=None):
+    path = cache_path(path)
+    args_hash = json_hash(json_args)
+    cache_hashes = os.listdir(path)
+    return args_hash in cache_hashes
 
 
 def json_hash(json_args):

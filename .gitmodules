@@ -1,0 +1,3 @@
+[submodule "coingecko/pycoingecko"]
+	path = coingecko/pycoingecko
+	url = https://github.com/yetisir/pycoingecko.git

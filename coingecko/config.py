@@ -8,7 +8,7 @@ import yaml
 
 import os
 
-logging.getLogger().setLevel(logging.INFO)
+logging.getLogger().setLevel(logging.DEBUG)
 
 
 try:

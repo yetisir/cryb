@@ -11,7 +11,8 @@ coin_ids:
   - tezos
 
 max_retries: 10
-request_delay: 0.2
+rate_limit: 80
+rate_timeframe: 60
 concurrent_requests: 10
 
 smart_scan: false
