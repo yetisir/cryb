@@ -12,23 +12,11 @@ import apirequests
 
 
 class Coins:
-    # @utils.scheduler('1w')
     async def get_coins(self):
         coin_list = await self.coin_list()
         asyncio.gather(*map(self.get_coin, coin_list))
-        # for coin in coin_list:
-        #     coin_id = coin['id']
-        #     # temp
-        #     if coin_id not in config.settings['coin_ids']:
-        #         continue
-        #     coin = Coin(coin_id)
-
-        #     await coin.get_info()
-        #     await coin.get_history()
 
     async def get_coin(self, coin_id):
-
-        # temp
         if coin_id not in config.settings['coin_ids']:
             return
         coin = Coin(coin_id)
@@ -42,7 +30,6 @@ class Coins:
 
 
 class Coin:
-
     def __init__(self, coin_id, **kwargs):
         super().__init__(**kwargs)
 
@@ -210,10 +197,8 @@ class CoinHistorySnapshot:
 
     @property
     def timestamp(self):
-        return (
-            datetime.datetime(self.date.year, self.date.month, self.date.day) +
-            datetime.timedelta(days=1, microseconds=-1)
-        ).timestamp()
+        return datetime.datetime(
+            self.date.year, self.date.month, self.date.day).timestamp()
 
     @property
     def date_str(self):

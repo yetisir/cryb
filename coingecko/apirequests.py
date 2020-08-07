@@ -96,20 +96,9 @@ async def worker(name):
         partial = functools.partial(
             api_request, request['method_name'], *request['args'], **request['kwargs'])
 
-        # try:
         response = await loop.run_in_executor(None, partial)
         jobs[request['id']]['response'] = response
         jobs[request['id']]['event'].set()
-        # except requests.exceptions.HTTPError:
-        #     if request['attempt'] <= config.settings['max_retries']:
-        #         logging.info('HTTPError, waiting 5 seconds to retry:')
-        #         queue.
-        #         loop = asyncio.get_event_loop()
-        #         loop.create_task(add(
-        #             request['method_name'],
-        #             *request['args'],
-        #             attempt=request['attempt'] + 1,
-        #             **request['kwargs']))
 
 
 async def run():
