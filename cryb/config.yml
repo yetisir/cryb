@@ -10,49 +10,25 @@ coin_ids:
   - binancecoin
   - tezos
 
-max_retries: 10
-rate_limit: 60
-rate_timeframe: 60
-concurrent_requests: 10
-
-requests_cache: cache
-
-smart_scan: false
-
-
-databases:
-  mongodb:
-  sqlite:
-  redis:
-  postgresql:
-  sqlite:
-
-message_brokers:
-  rabbitmq:
-    host: localhost
-    port: port
-    'amqp://myuser:mypassword@localhost:5672/myvhost'
-  redis:
-    host:
-    port:
-       'redis://:password@hostname:port/db_number'
-  sqs: 'sqs://ABCDEFGHIJKLMNOPQRST:ZYXK7NiynGlTogH8Nj+P9nlE73sq3@'
-  zookeeper: none
-
 connections:
   requests_cache:
     backend:
+      redis:
+        host: ${REDIS_HOST}
+        port: ${REDIS_PORT}
+        password: ${REDIS_PASSWORD}
+        db_number: ${REDIS_DB_NUMBER}
   task_queue:
-    broker: 
-      rabbitmq: 
+    broker:
+      rabbitmq:
         host: rabbitmq
-        port: 5672
+        port: ${RABBITMQ_PORT}
         user: ${RABBITMQ_USER}
         password: ${RABBITMQ_PASSWORD}
-        virtualhost: 
-    serialization:
-      type:
-      parameters:
+        virtualhost: ${RABBITMQ_PASSWORD}
+    # serialization:
+    #   type:
+    #   parameters:
 
 destinations:
   - domain: coingecko.com

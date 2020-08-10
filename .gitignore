@@ -13,5 +13,7 @@ tests/test-reports
 *.swp
 
 # SQLite
-
 *.sqlite
+
+# Env
+.env

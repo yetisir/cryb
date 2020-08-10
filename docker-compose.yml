@@ -8,10 +8,19 @@ services:
   #     - 127.0.0.1:9050:9050
   #     - 127.0.0.1:9150:9150
 
+  redis:
+    image: redis:6.0-buster
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    environment:
+      REDIS_DB_NUMBER: ${REDIS_DB_NUMBER}
+    restart: always
+
   rabbitmq:
     image: rabbitmq:3.8-alpine
     ports:
-      - ${RABBITMQ_PORT}:${RABBITMQ_PORT}
+      - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
@@ -19,11 +28,15 @@ services:
     restart: always
 
   workers:
-    image: python:3.6
+    build: cryb/workers
     environment:
-      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: ${RABBITMQ_PORT}
       RABBITMQ_USER: ${RABBITMQ_USER}
       RABBITMQ_PASS: ${RABBITMQ_PASSWORD}
       RABBITMQ_VHOST: ${RABBITMQ_VIRTUALHOST}
+    restart: always
+
+  scheduler:
+    build: cryb/scheduler
     restart: always
