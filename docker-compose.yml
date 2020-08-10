@@ -28,7 +28,8 @@ services:
     restart: always
 
   workers:
-    build: cryb/workers
+    build: .
+    command: worker
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: ${RABBITMQ_PORT}
@@ -37,6 +38,7 @@ services:
       RABBITMQ_VHOST: ${RABBITMQ_VIRTUALHOST}
     restart: always
 
-  scheduler:
-    build: cryb/scheduler
+  crawlers:
+    build: .
+    command: crawlers
     restart: always
