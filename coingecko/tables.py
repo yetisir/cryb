@@ -90,9 +90,9 @@ class CoinMarketData(config.Base):
     date = sql.Column(sql.String())
     coin_id = sql.Column(sql.String(), sql.ForeignKey(
         'coin.id'), primary_key=True)
-    price_usd = sql.Column(sql.Float, nullable=False)
-    market_cap_usd = sql.Column(sql.Float, nullable=False)
-    volume_usd = sql.Column(sql.Float, nullable=False)
+    price_usd = sql.Column(sql.Float)
+    market_cap_usd = sql.Column(sql.Float)
+    volume_usd = sql.Column(sql.Float)
 
 
 class CoinMarketDataSchema(ma.SQLAlchemyAutoSchema):

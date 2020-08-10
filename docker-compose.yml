@@ -1,34 +1,29 @@
-version: '3'
+version: "3"
 
 services:
-  postgres:
-    build: ./postgres
+  # tor:
+  #   image: osminogin/tor-simple
+  #   restart: always
+  #   ports:
+  #     - 127.0.0.1:9050:9050
+  #     - 127.0.0.1:9150:9150
+
+  rabbitmq:
+    image: rabbitmq:3.8-alpine
     ports:
-      - 5432:5432
-    volumes:
-      - postgres:/var/lib/postgres
+      - ${RABBITMQ_PORT}:${RABBITMQ_PORT}
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: coingecko
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VIRTUALHOST}
     restart: always
 
-  coingecko:
-    build: ./coingecko
-    ports:
-      - 5001:5001
-    volumes:
-      - ./coingecko:/app # for debug mode - not neccessary for production
+  workers:
+    image: python:3.6
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: coingecko 
-      POSTGRES_PORT: 5432
-      POSTGRES_HOST: postgres
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VHOST: ${RABBITMQ_VIRTUALHOST}
     restart: always
-    depends_on:
-        - postgres
-
-volumes:
-  postgres:
-    driver: local

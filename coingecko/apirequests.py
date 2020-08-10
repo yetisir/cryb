@@ -102,7 +102,6 @@ class WorkerPool:
             *[self.worker() for _ in range(self.workers)])
 
 
-@utils.cache()
 def api_request(method_name, *args, **kwargs):
     method = getattr(api, method_name)
     return method(*args, **kwargs)

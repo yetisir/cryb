@@ -5,11 +5,12 @@ import sqlalchemy
 from sqlalchemy.ext import declarative
 from sqlalchemy.orm import sessionmaker
 import yaml
+import requests_cache
 
 import os
 
 logging.getLogger().setLevel(logging.DEBUG)
-
+requests_cache.install_cache('requests_cache')
 
 try:
     db_user = os.environ['POSTGRES_USER']
