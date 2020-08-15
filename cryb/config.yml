@@ -12,7 +12,7 @@ coin_ids:
 
 smart_scan: false # TODO: replace
 
-max_retries: 10
+max_retries: null
 
 connections:
   requests_cache:

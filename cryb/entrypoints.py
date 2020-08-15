@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
+import asyncio
 
 from . import worker
+from .crawlers import coingecko
 
 
 class EntryPoint(ABC):
@@ -34,7 +36,11 @@ class Crawl(EntryPoint):
     description = 'Starts cryb crawler processes'
 
     def run(self, options):
-        pass
+        loop = asyncio.get_event_loop()
+        import pdb
+        pdb.set_trace()
+        loop.run_until_complete(
+            coingecko.Coins().get_coin('bitcoin-cash'))
 
     def build_parser(self, parser):
         pass

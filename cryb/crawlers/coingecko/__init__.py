@@ -10,6 +10,8 @@ from ...config import config
 from .. import base
 from . import tables
 
+tables.create_all()
+
 
 class CoinGeckoCrawler(base.Crawler):
     api = pycoingecko.CoinGeckoAPI()
@@ -25,19 +27,26 @@ class CoinGeckoCrawler(base.Crawler):
 class Coins(CoinGeckoCrawler):
     async def get_coins(self):
         coin_list = await self.coin_list()
-        asyncio.gather(*map(self.get_coin, coin_list))
+        # loop = asyncio.get_event_loop()
+        # for coin in coin_list:
+        #     loop.create_task(self.get_coin(coin))
+
+        await asyncio.gather(*map(self.get_coin, coin_list))
+
+        return coin_list
 
     async def get_coin(self, coin_id):
         if coin_id not in config.coin_ids:
             return
         coin = Coin(coin_id)
         await coin.get_info()
-        loop = asyncio.get_event_loop()
-        loop.create_task(coin.get_history())
+        # loop = asyncio.get_event_loop()
+        # await coin.get_history()
+        return coin.info
 
     async def coin_list(self):
         response = await self.request(f'{self.base_url}/coins/list')
-        return [coin['id'] for coin in response]
+        return [coin['id'] for coin in response if coin['id'] in config.coin_ids]
 
 
 class Coin(CoinGeckoCrawler):
@@ -224,7 +233,7 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
             localization=False
         )
         url = f'{self.base_url}/coins/{self.coin_id}/history/{url_parameters}'
-        self.raw_info = await self.request(url)
+        self.raw_data = await self.request(url)
 
         logging.info(
             f'Downloaded {self.coin_id} data for {self.date_str} ...')
@@ -240,7 +249,8 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
             self.valid_social_data = False
             return
         schema = tables.CoinSocialDataSchema()
-        tatables.db_session.commit()
+        tables.db_session.add(schema.load(self.social_data))
+        tables.db_session.commit()
 
     def save_developer_data(self):
         if 'developer_data' not in self.raw_data.keys():
@@ -256,7 +266,7 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
             return
         schema = tables.CoinMarketDataSchema()
         tables.db_session.add(schema.load(self.market_data))
-        tablse.db_session.commit()
+        tables.db_session.commit()
 
     @property
     def social_data(self):
