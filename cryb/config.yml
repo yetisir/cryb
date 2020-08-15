@@ -10,7 +10,9 @@ coin_ids:
   - binancecoin
   - tezos
 
-smart_scan: false
+smart_scan: false # TODO: replace
+
+max_retries: 10
 
 connections:
   requests_cache:
@@ -23,7 +25,7 @@ connections:
   task_queue:
     broker:
       rabbitmq:
-        host: localhost #rabbitmq
+        host: ${RABBITMQ_HOST}
         port: ${RABBITMQ_PORT}
         user: ${RABBITMQ_USER}
         password: ${RABBITMQ_PASSWORD}

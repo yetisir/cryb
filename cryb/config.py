@@ -4,6 +4,8 @@ import pathlib
 import configurator
 import dotenv
 
+import logging
+
 
 def lookup_environment(config):
     """Recursively substitute all environemnt vairables if they exist"""
@@ -18,7 +20,8 @@ def lookup_environment(config):
 
 
 # load environment variables from .env
-dotenv.load_dotenv()
+# path = pathlib.Path(__file__).parent / '.env'
+dotenv.load_dotenv('.env')
 
 # load raw config from config.yml
 settings_path = pathlib.Path(__file__).parent / 'config.yml'

@@ -9,10 +9,10 @@ from . import cache, connections, proxies, celery
 from .config import config
 
 
-def run():
-    cache.setup()
-    requests.get(
-        'http://httpbin.org/ip')
+# def run():
+#     cache.setup()
+#     requests.get(
+#         'http://httpbin.org/ip')
 
 
 # @celery.task(bind=True)
@@ -35,20 +35,37 @@ def run():
 #         return response
 
 
-@celery.task
-def request(url, max_retries=None):
+@celery.task(bind=True)
+def request(self, url, queue=None, max_retries=None):
     cache.setup()
-    response = requests.get(url, timeout=(5.0, 30.0))
 
-    try:
-        return response.json()
-    except json.JSONDecodeError:
-        if response.status_code == 200:
-            return response.text
-        else:
-            return response.status_code()
+    with celery.connection_for_read() as connection:
+        print(connection, queue)
+        # getting token
+        msg = connection.default_channel.basic_get(
+            f'{queue}_tokens', no_ack=True)
+        print(msg)
+        # received None - queue is empty, no tokens
+        if msg is None:
+            # repeat task after 1 second
+            raise self.retry(countdown=1)
+
+    response = requests.get(url, timeout=(5.0, 30.0))
+    return parse_response(response)
 
 
 @celery.task
 def issue_token():
     return 1
+
+
+def parse_response(response):
+    try:
+        temp = response.json()
+        print(str(temp)[:50])
+        return temp
+    except json.JSONDecodeError:
+        if response.status_code == 200:
+            return response.text
+        else:
+            return response.status_code()

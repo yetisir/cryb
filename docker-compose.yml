@@ -29,12 +29,8 @@ services:
 
   workers:
     build: .
-    environment:
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: ${RABBITMQ_PORT}
-      RABBITMQ_USER: ${RABBITMQ_USER}
-      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-      RABBITMQ_VIRTUALHOST: ${RABBITMQ_VIRTUALHOST}
+    env_file:
+      - .env
     volumes:
       - ./cryb:/app/cryb
     restart: always
@@ -44,20 +40,16 @@ services:
       - tor
     command: celery -A cryb.worker worker -l info -c 10 -Q coingecko.com -O fair
 
-  # scheduler:
-  #   build: .
-  #   environment:
-  #     RABBITMQ_HOST: rabbitmq
-  #     RABBITMQ_PORT: ${RABBITMQ_PORT}
-  #     RABBITMQ_USER: ${RABBITMQ_USER}
-  #     RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-  #     RABBITMQ_VIRTUALHOST: ${RABBITMQ_VIRTUALHOST}
-  #   volumes:
-  #     - ./cryb:/app/cryb
-  #   restart: always
-  #   depends_on:
-  #     - workers
-  #   command: celery -A cryb.scheduler beat -l info
+  scheduler:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./cryb:/app/cryb
+    restart: always
+    depends_on:
+      - workers
+    command: celery -A cryb.scheduler beat -l info
 
   crawlers:
     build: .

@@ -11,9 +11,12 @@ def get_task_queues():
         task_queues.append(Queue(destination.domain))
         if destination.rate_limit:
             task_queues.append(
-                Queue(f'{destination.domain}_tokens', max_length=2))
+                Queue(
+                    f'{destination.domain}_tokens',
+                    max_length=2,
+                ))
     return task_queues
 
 
 celery = Celery('cryb', broker=connections.rabbitmq(), backend='rpc://')
-# celery.conf.task_queues = get_task_queues()
+celery.conf.task_queues = get_task_queues()

@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
+import asyncio
 
 import requests
 
-from .. import cache, celery
+from .. import cache
 from .. import worker
 from ..config import config
 
@@ -13,18 +14,20 @@ class Crawler(ABC):
         super().__init__()
         cache.setup()
 
-    def request(self, url):
-        if cache.has_url(url):
-            return requests.get(url)
+    async def request(self, url):
+        # if cache.has_url(url):
+        #     return worker.parse_response(requests.get(url))
 
         for destination in config.destinations:
-            if url in destination.domain:
-                return worker.request.apply_async(
+            if destination.domain in url:
+                loop = asyncio.get_event_loop()
+                func = worker.request.apply_async(
                     args=(url,),
                     kwargs={
-                        'max_retries': destination.max_retries,
+                        'max_retries': config.max_retries,
                         'queue': destination.domain,
                     },
-                    queue=destination.domain)
+                    queue=destination.domain).wait
+                return await loop.run_in_executor(None, func)
         else:
-            return requests.get(url)
+            return worker.parse_response(requests.get(url))
