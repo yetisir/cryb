@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 import requests_cache
 import configurator
@@ -39,4 +40,5 @@ def main(args=None):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
     main()

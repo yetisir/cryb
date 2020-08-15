@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from . import worker
+
 
 class EntryPoint(ABC):
     """Base class for CLI Entrypoints. This is an interface to
@@ -32,7 +34,7 @@ class Workers(EntryPoint):
     description = 'Starts cryb worker processes'
 
     def run(self, options):
-        pass
+        worker.run()
 
     def build_parser(self, parser):
         pass

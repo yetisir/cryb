@@ -1,34 +1,26 @@
 import sqlalchemy as sql
 from sqlalchemy.ext import declarative
-from sqlalchemy.orm import relationship, sessionmaker
-
+from sqlalchemy.orm import relationship
 import marshmallow_sqlalchemy as ma
 
-from ... import connections
-
-
-db_engine = sql.create_engine(connections.postgresql())
-Session = sessionmaker(bind=db_engine)
-db_session = Session()
-Base = declarative.declarative_base()
-Base.metadata.bind = db_engine
+import config
 
 
 def create_all():
-    Base.metadata.create_all()
+    config.metadata.create_all()
 
 
 def schema_metadata(cls):
     class Meta:
         model = cls
         load_instance = True
-        sqla_session = db_session
+        sqla_session = config.db_session
         include_fk = True
         include_relationships = True
     return Meta
 
 
-class Coin(Base):
+class Coin(config.Base):
     __tablename__ = 'coin'
 
     id = sql.Column(sql.String(), primary_key=True)
@@ -48,7 +40,7 @@ class CoinSchema(ma.SQLAlchemyAutoSchema):
     Meta = schema_metadata(Coin)
 
 
-class CoinSocialData(Base):
+class CoinSocialData(config.Base):
     __tablename__ = 'coin_social_data'
 
     timestamp = sql.Column(sql.Integer(), primary_key=True)
@@ -68,7 +60,7 @@ class CoinSocialDataSchema(ma.SQLAlchemyAutoSchema):
     Meta = schema_metadata(CoinSocialData)
 
 
-class CoinDeveloperData(Base):
+class CoinDeveloperData(config.Base):
     __tablename__ = 'coin_developer_data'
 
     timestamp = sql.Column(sql.Integer(), primary_key=True)
@@ -91,7 +83,7 @@ class CoinDeveloperDataSchema(ma.SQLAlchemyAutoSchema):
     Meta = schema_metadata(CoinDeveloperData)
 
 
-class CoinMarketData(Base):
+class CoinMarketData(config.Base):
     __tablename__ = 'coin_market_data'
 
     timestamp = sql.Column(sql.Integer(), primary_key=True)

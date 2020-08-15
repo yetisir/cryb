@@ -1,12 +1,12 @@
 version: "3"
 
 services:
-  # tor:
-  #   image: osminogin/tor-simple
-  #   restart: always
-  #   ports:
-  #     - 127.0.0.1:9050:9050
-  #     - 127.0.0.1:9150:9150
+  tor:
+    image: osminogin/tor-simple
+    restart: always
+    ports:
+      - 127.0.0.1:9050:9050
+      - 127.0.0.1:9150:9150
 
   redis:
     image: redis:6.0-buster
@@ -29,16 +29,45 @@ services:
 
   workers:
     build: .
-    command: worker
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: ${RABBITMQ_PORT}
       RABBITMQ_USER: ${RABBITMQ_USER}
-      RABBITMQ_PASS: ${RABBITMQ_PASSWORD}
-      RABBITMQ_VHOST: ${RABBITMQ_VIRTUALHOST}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VIRTUALHOST: ${RABBITMQ_VIRTUALHOST}
+    volumes:
+      - ./cryb:/app/cryb
     restart: always
+    depends_on:
+      - rabbitmq
+      - redis
+      - tor
+    command: celery -A cryb.worker worker -l info -c 10 -Q coingecko.com -O fair
+
+  # scheduler:
+  #   build: .
+  #   environment:
+  #     RABBITMQ_HOST: rabbitmq
+  #     RABBITMQ_PORT: ${RABBITMQ_PORT}
+  #     RABBITMQ_USER: ${RABBITMQ_USER}
+  #     RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+  #     RABBITMQ_VIRTUALHOST: ${RABBITMQ_VIRTUALHOST}
+  #   volumes:
+  #     - ./cryb:/app/cryb
+  #   restart: always
+  #   depends_on:
+  #     - workers
+  #   command: celery -A cryb.scheduler beat -l info
 
   crawlers:
     build: .
-    command: crawlers
-    restart: always
+    # command: cryb crawlers
+    # restart: always
+
+  monitor:
+    image: mher/flower
+    ports:
+      - 5555:5555
+    depends_on:
+      - rabbitmq
+    command: --broker=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:${RABBITMQ_PORT}/${RABBITMQ_VIRTUALHOST}

@@ -10,6 +10,8 @@ coin_ids:
   - binancecoin
   - tezos
 
+smart_scan: false
+
 connections:
   requests_cache:
     backend:
@@ -21,11 +23,11 @@ connections:
   task_queue:
     broker:
       rabbitmq:
-        host: rabbitmq
+        host: localhost #rabbitmq
         port: ${RABBITMQ_PORT}
         user: ${RABBITMQ_USER}
         password: ${RABBITMQ_PASSWORD}
-        virtualhost: ${RABBITMQ_PASSWORD}
+        virtualhost: ${RABBITMQ_VIRTUALHOST}
     # serialization:
     #   type:
     #   parameters:
