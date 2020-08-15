@@ -29,19 +29,8 @@ class EntryPoint(ABC):
         raise NotImplementedError
 
 
-class Workers(EntryPoint):
-    name = 'workers'
-    description = 'Starts cryb worker processes'
-
-    def run(self, options):
-        worker.run()
-
-    def build_parser(self, parser):
-        pass
-
-
-class Crawlers(EntryPoint):
-    name = 'crawlers'
+class Crawl(EntryPoint):
+    name = 'crawl'
     description = 'Starts cryb crawler processes'
 
     def run(self, options):

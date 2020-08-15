@@ -3,7 +3,6 @@ from kombu import Queue
 from celery import Celery
 from functools import wraps
 import requests
-import json
 
 from . import cache, connections, proxies, celery
 from .config import config
@@ -51,21 +50,9 @@ def request(self, url, queue=None, max_retries=None):
             raise self.retry(countdown=1)
 
     response = requests.get(url, timeout=(5.0, 30.0))
-    return parse_response(response)
+    return response
 
 
 @celery.task
 def issue_token():
     return 1
-
-
-def parse_response(response):
-    try:
-        temp = response.json()
-        print(str(temp)[:50])
-        return temp
-    except json.JSONDecodeError:
-        if response.status_code == 200:
-            return response.text
-        else:
-            return response.status_code()

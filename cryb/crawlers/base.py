@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import asyncio
+import json
 
 import requests
 
@@ -27,7 +28,18 @@ class Crawler(ABC):
                         'max_retries': config.max_retries,
                         'queue': destination.domain,
                     },
-                    queue=destination.domain).wait
-                return await loop.run_in_executor(None, func)
+                    queue=destination.domain)
+                response = await loop.run_in_executor(None, func.get)
+                return self.parse_response(response)
         else:
-            return worker.parse_response(requests.get(url))
+            return self.parse_response(requests.get(url))
+
+    @staticmethod
+    def parse_response(response):
+        try:
+            return response.json()
+        except json.JSONDecodeError:
+            if response.status_code == 200:
+                return response.text
+            else:
+                return response.status_code()

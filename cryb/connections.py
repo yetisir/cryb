@@ -6,6 +6,15 @@ from .config import config
 
 def redis():
     redis_config = config.connections.requests_cache.backend.redis
+    return (
+        f'redis://:{redis_config.password}'
+        f'@{redis_config.host}:{redis_config.port}'
+        f'/{redis_config.db_number}'
+    )
+
+
+def redis_client():
+    redis_config = config.connections.requests_cache.backend.redis
     return redis_module.Redis(
         host=redis_config.host,
         port=redis_config.port,

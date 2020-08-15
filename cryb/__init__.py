@@ -18,5 +18,9 @@ def get_task_queues():
     return task_queues
 
 
-celery = Celery('cryb', broker=connections.rabbitmq(), backend='rpc://')
+celery = Celery(
+    'cryb', broker=connections.rabbitmq(), backend=connections.redis())
 celery.conf.task_queues = get_task_queues()
+celery.conf.accept_content = ['pickle']
+celery.conf.result_serializer = 'pickle'
+celery.conf.task_serializer = 'pickle'

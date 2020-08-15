@@ -5,7 +5,7 @@ from . import connections
 
 def setup():
     backend = requests_cache.backends.RedisCache(
-        connection=connections.redis())
+        connection=connections.redis_client())
     requests_cache.install_cache(backend=backend)
 
 

@@ -19,7 +19,7 @@ class CoinGeckoCrawler(base.Crawler):
         parameter_list = [
             f'{parameter}={value}' for parameter, value in parameters.items()]
         parameter_url = '&'.join(parameter_list)
-        return f'?{parameter_url}'
+        return f'?{parameter_url}'.lower()
 
 
 class Coins(CoinGeckoCrawler):
