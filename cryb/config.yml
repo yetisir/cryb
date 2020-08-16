@@ -1,0 +1,58 @@
+coin_ids:
+  - bitcoin
+  - ethereum
+  - ripple
+  - tether
+  - bitcoin-cash
+  - bitcoin-cash-sv
+  - litecoin
+  - eos
+  - binancecoin
+  - tezos
+
+timeseries_start: 2015-01-01
+
+max_retries: null
+
+connections:
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+    database_number: ${REDIS_DB_NUMBER}
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    user: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    virtualhost: ${RABBITMQ_VIRTUALHOST}
+
+  postgres:
+    host: ${POSTGRES_HOST}
+    port: ${POSTGRES_PORT}
+    user: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    database: ${POSTGRES_DATABASE}
+
+destinations:
+  - domain: coingecko.com
+    proxy: false
+    rate_limit:
+      requests: 60
+      timeframe: 60
+  - domain: archived.moe
+    proxy: true
+    rate_limit:
+      requests: 100
+      timeframe: 60
+  - domain: pushshift.io
+    proxy: true
+    rate_limit:
+      requests: 100
+      timeframe: 60
+  - domain: reddit.com
+    proxy: true
+    rate_limit:
+      requests: 100
+      timeframe: 60

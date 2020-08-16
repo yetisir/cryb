@@ -1,26 +1,34 @@
 import sqlalchemy as sql
 from sqlalchemy.ext import declarative
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
+
 import marshmallow_sqlalchemy as ma
 
-import config
+from ... import connections
+
+
+db_engine = sql.create_engine(connections.postgresql())
+Session = sessionmaker(bind=db_engine)
+db_session = Session()
+Base = declarative.declarative_base()
+Base.metadata.bind = db_engine
 
 
 def create_all():
-    config.metadata.create_all()
+    Base.metadata.create_all()
 
 
 def schema_metadata(cls):
     class Meta:
         model = cls
         load_instance = True
-        sqla_session = config.db_session
+        sqla_session = db_session
         include_fk = True
         include_relationships = True
     return Meta
 
 
-class Coin(config.Base):
+class Coin(Base):
     __tablename__ = 'coin'
 
     id = sql.Column(sql.String(), primary_key=True)
@@ -40,7 +48,7 @@ class CoinSchema(ma.SQLAlchemyAutoSchema):
     Meta = schema_metadata(Coin)
 
 
-class CoinSocialData(config.Base):
+class CoinSocialData(Base):
     __tablename__ = 'coin_social_data'
 
     timestamp = sql.Column(sql.Integer(), primary_key=True)
@@ -60,7 +68,7 @@ class CoinSocialDataSchema(ma.SQLAlchemyAutoSchema):
     Meta = schema_metadata(CoinSocialData)
 
 
-class CoinDeveloperData(config.Base):
+class CoinDeveloperData(Base):
     __tablename__ = 'coin_developer_data'
 
     timestamp = sql.Column(sql.Integer(), primary_key=True)
@@ -83,16 +91,16 @@ class CoinDeveloperDataSchema(ma.SQLAlchemyAutoSchema):
     Meta = schema_metadata(CoinDeveloperData)
 
 
-class CoinMarketData(config.Base):
+class CoinMarketData(Base):
     __tablename__ = 'coin_market_data'
 
     timestamp = sql.Column(sql.Integer(), primary_key=True)
     date = sql.Column(sql.String())
     coin_id = sql.Column(sql.String(), sql.ForeignKey(
         'coin.id'), primary_key=True)
-    price_usd = sql.Column(sql.Float, nullable=False)
-    market_cap_usd = sql.Column(sql.Float, nullable=False)
-    volume_usd = sql.Column(sql.Float, nullable=False)
+    price_usd = sql.Column(sql.Float)
+    market_cap_usd = sql.Column(sql.Float)
+    volume_usd = sql.Column(sql.Float)
 
 
 class CoinMarketDataSchema(ma.SQLAlchemyAutoSchema):
