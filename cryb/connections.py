@@ -5,26 +5,26 @@ from .config import config
 
 
 def redis():
-    redis_config = config.connections.requests_cache.backend.redis
+    redis_config = config.connections.redis
     return (
         f'redis://:{redis_config.password}'
         f'@{redis_config.host}:{redis_config.port}'
-        f'/{redis_config.db_number}'
+        f'/{redis_config.database_number}'
     )
 
 
 def redis_client():
-    redis_config = config.connections.requests_cache.backend.redis
+    redis_config = config.connections.redis
     return redis_module.Redis(
         host=redis_config.host,
         port=redis_config.port,
-        db=redis_config.db_number,
+        db=redis_config.database_number,
         password=redis_config.password,
     )
 
 
 def rabbitmq():
-    rabbitmq_config = config.connections.task_queue.broker.rabbitmq
+    rabbitmq_config = config.connections.rabbitmq
     return (
         f'pyamqp://{rabbitmq_config.user}:{rabbitmq_config.password}'
         f'@{rabbitmq_config.host}:{rabbitmq_config.port}'
@@ -33,5 +33,9 @@ def rabbitmq():
 
 
 def postgresql():
-    # TODO
-    return 'sqlite:///temp.sqlite'
+    postgres_config = config.connections.postgres
+    return (
+        f'postgres+psycopg2://{postgres_config.user}:{postgres_config.password}'
+        f'@{postgres_config.host}:{postgres_config.port}'
+        f'/{postgres_config.database}'
+    )

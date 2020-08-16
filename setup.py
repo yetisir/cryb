@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='Cryb',
-    version='0.1.0',
+    version='0.2.0',
     description='Cryptocurrency data scraper',
     url='https://github.com/yetisir/cryb',
     author='M. Yetisir',
@@ -16,7 +16,9 @@ setup(
         'python-dotenv>=0.13',
         'requests>=2.24',
         'requests-cache>=0.5',
-        'stem>=1.8'
+        'sqlalchemy>=1.3',
+        'psycopg2-binary>=2.8',
+        'stem>=1.8',
     ],
     # extras_require={
     #     'dev': [

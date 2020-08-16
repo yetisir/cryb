@@ -17,3 +17,6 @@ tests/test-reports
 
 # Env
 .env
+
+# DB
+data/

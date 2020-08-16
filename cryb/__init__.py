@@ -18,6 +18,7 @@ def get_task_queues():
     return task_queues
 
 
+print(connections.redis())
 celery = Celery(
     'cryb', broker=connections.rabbitmq(), backend=connections.redis())
 celery.conf.task_queues = get_task_queues()
