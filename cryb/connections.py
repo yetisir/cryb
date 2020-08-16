@@ -13,6 +13,10 @@ def redis():
     )
 
 
+def rpc():
+    return 'rpc://'
+
+
 def redis_client():
     redis_config = config.connections.redis
     return redis_module.Redis(

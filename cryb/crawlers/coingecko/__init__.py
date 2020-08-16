@@ -23,22 +23,35 @@ class CoinGeckoCrawler(base.Crawler):
 
 
 class Coins(CoinGeckoCrawler):
-    async def get_coins(self):
+    async def get(self):
+        for target in config.targets:
+            if target.domain in self.base_url:
+                chunksize = target.concurrency
+                break
         coin_list = await self.coin_list()
+        for i in range(0, len(coin_list), chunksize):
+            await self.get_coins(coin_list[i:i+chunksize])
+
+    async def get_coins(self, coin_list):
+        logging.debug(coin_list)
         coins = map(self.get_coin, coin_list)
         await asyncio.gather(*coins)
 
     async def get_coin(self, coin_id):
-        if coin_id not in config.coin_ids:
-            return
         coin = Coin(coin_id)
         await coin.get_info()
         await coin.get_history()
-        return coin.info
 
     async def coin_list(self):
-        response = await self.request(f'{self.base_url}/coins/list')
-        return [coin['id'] for coin in response if coin['id'] in config.coin_ids]
+        url_parameters = self.api_parameters(
+            vs_currency='usd',
+            order='market_cap_desc',
+            per_page=250,
+            page=1,
+            sparkline=False
+        )
+        response = await self.request(f'{self.base_url}/coins/markets/{url_parameters}')
+        return [coin['id'] for coin in response]
 
 
 class Coin(CoinGeckoCrawler):
@@ -69,7 +82,7 @@ class Coin(CoinGeckoCrawler):
         self.save()
 
     def save(self):
-        schema = tables.CoinSchema()
+        schema = tables.CoinInfoSchema()
         tables.db_session.add(schema.load(self.info))
         tables.db_session.commit()
 
@@ -156,19 +169,17 @@ class CoinHistory(CoinGeckoCrawler):
     async def query(self):
 
         date = datetime.datetime.utcnow().date()
-        # date_increment = datetime.timedelta(days=1)
-
-        # max_date = min(
-        #     self.get_max_date(tables.CoinDeveloperData),
-        #     self.get_max_date(tables.CoinSocialData),
-        # )
 
         date_span = date - config.timeseries_start
         all_dates = [
             date - datetime.timedelta(days=days) for
             days in range(date_span.days)]
 
-        existing_dates = self.get_dates()
+        existing_dates = set.intersection(
+            set(self.get_dates(tables.CoinSocialHistory)),
+            set(self.get_dates(tables.CoinDeveloperHistory)),
+            set(self.get_dates(tables.CoinMarketHistory)),
+        )
 
         missing_dates = sorted(list(
             set(all_dates) - set(existing_dates)), reverse=True)
@@ -177,11 +188,9 @@ class CoinHistory(CoinGeckoCrawler):
             coin_snapshot = CoinHistorySnapshot(self.coin_id, date)
             await coin_snapshot.query()
 
-    def get_dates(self):
-        dates = tables.db_session.query(tables.CoinDeveloperData.timestamp).join(
-            tables.CoinSocialData,
-            tables.CoinSocialData.date == tables.CoinDeveloperData.date
-        ).distinct().all()
+    def get_dates(self, table):
+        dates = tables.db_session.query(table.timestamp).filter(
+            table.coin_id == self.coin_id).all()
 
         return [
             datetime.datetime.fromtimestamp(date[0]).date() for
@@ -242,7 +251,7 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
             self.save()
         else:
             logging.info(
-                f'Error Downloading {self.coin_id} data for {self.date_str} ...')
+                f'{self.coin_id} data for {self.date_str} does not exist...')
 
     def save(self):
         self.save_social_data()
@@ -253,7 +262,7 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
         if 'community_data' not in self.raw_data.keys():
             self.valid_social_data = False
             return
-        schema = tables.CoinSocialDataSchema()
+        schema = tables.CoinSocialHistorySchema()
         tables.db_session.add(schema.load(self.social_data))
         tables.db_session.commit()
 
@@ -261,7 +270,7 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
         if 'developer_data' not in self.raw_data.keys():
             self.valid_developer_data = False
             return
-        schema = tables.CoinDeveloperDataSchema()
+        schema = tables.CoinDeveloperHistorySchema()
         tables.db_session.add(schema.load(self.developer_data))
         tables.db_session.commit()
 
@@ -269,7 +278,7 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
         if 'market_data' not in self.raw_data.keys():
             self.valid_market_data = False
             return
-        schema = tables.CoinMarketDataSchema()
+        schema = tables.CoinMarketHistorySchema()
         tables.db_session.add(schema.load(self.market_data))
         tables.db_session.commit()
 

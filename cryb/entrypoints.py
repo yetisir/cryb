@@ -36,10 +36,16 @@ class Crawl(EntryPoint):
     description = 'Starts cryb crawler processes'
 
     def run(self, options):
+        print('Starting')
         loop = asyncio.get_event_loop()
         coins = coingecko.Coins()
-        loop.create_task(coins.get_coins())
-        loop.run_forever()
+        while True:
+            try:
+                loop.run_until_complete(coins.get())
+            except KeyboardInterrupt:
+                exit()
+            except Exception:
+                pass
 
     def build_parser(self, parser):
         pass

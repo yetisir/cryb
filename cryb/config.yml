@@ -35,24 +35,32 @@ connections:
     password: ${POSTGRES_PASSWORD}
     database: ${POSTGRES_DATABASE}
 
-destinations:
+targets:
   - domain: coingecko.com
     proxy: false
+    cache: true
+    concurrency: 10
     rate_limit:
       requests: 60
       timeframe: 60
   - domain: archived.moe
     proxy: true
+    cache: false
+    concurrency: 10
     rate_limit:
       requests: 100
       timeframe: 60
   - domain: pushshift.io
     proxy: true
+    cache: false
+    concurrency: 10
     rate_limit:
       requests: 100
       timeframe: 60
   - domain: reddit.com
     proxy: true
+    cache: false
+    concurrency: 10
     rate_limit:
       requests: 100
       timeframe: 60

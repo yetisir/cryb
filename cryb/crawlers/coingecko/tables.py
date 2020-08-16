@@ -28,8 +28,8 @@ def schema_metadata(cls):
     return Meta
 
 
-class Coin(Base):
-    __tablename__ = 'coin'
+class CoinInfo(Base):
+    __tablename__ = 'coin_info'
 
     id = sql.Column(sql.String(), primary_key=True)
     symbol = sql.Column(sql.String(), nullable=False)
@@ -44,17 +44,17 @@ class Coin(Base):
     telegram = sql.Column(sql.String())
 
 
-class CoinSchema(ma.SQLAlchemyAutoSchema):
-    Meta = schema_metadata(Coin)
+class CoinInfoSchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(CoinInfo)
 
 
-class CoinSocialData(Base):
-    __tablename__ = 'coin_social_data'
+class CoinSocialHistory(Base):
+    __tablename__ = 'coin_social_history'
 
     timestamp = sql.Column(sql.Integer(), primary_key=True)
     date = sql.Column(sql.String())
     coin_id = sql.Column(sql.String(), sql.ForeignKey(
-        'coin.id'), primary_key=True)
+        'coin_info.id'), primary_key=True)
     facebook_likes = sql.Column(sql.Integer())
     twitter_followers = sql.Column(sql.Integer())
     reddit_average_posts_48h = sql.Column(sql.Float())
@@ -64,17 +64,17 @@ class CoinSocialData(Base):
     alexa_rank = sql.Column(sql.Integer())
 
 
-class CoinSocialDataSchema(ma.SQLAlchemyAutoSchema):
-    Meta = schema_metadata(CoinSocialData)
+class CoinSocialHistorySchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(CoinSocialHistory)
 
 
-class CoinDeveloperData(Base):
-    __tablename__ = 'coin_developer_data'
+class CoinDeveloperHistory(Base):
+    __tablename__ = 'coin_developer_history'
 
     timestamp = sql.Column(sql.Integer(), primary_key=True)
     date = sql.Column(sql.String())
     coin_id = sql.Column(sql.String(), sql.ForeignKey(
-        'coin.id'), primary_key=True)
+        'coin_info.id'), primary_key=True)
     forks = sql.Column(sql.Integer())
     stars = sql.Column(sql.Integer())
     subscribers = sql.Column(sql.Integer())
@@ -87,21 +87,21 @@ class CoinDeveloperData(Base):
     commit_count_4_weeks = sql.Column(sql.Float())
 
 
-class CoinDeveloperDataSchema(ma.SQLAlchemyAutoSchema):
-    Meta = schema_metadata(CoinDeveloperData)
+class CoinDeveloperHistorySchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(CoinDeveloperHistory)
 
 
-class CoinMarketData(Base):
-    __tablename__ = 'coin_market_data'
+class CoinMarketHistory(Base):
+    __tablename__ = 'coin_market_history'
 
     timestamp = sql.Column(sql.Integer(), primary_key=True)
     date = sql.Column(sql.String())
     coin_id = sql.Column(sql.String(), sql.ForeignKey(
-        'coin.id'), primary_key=True)
+        'coin_info.id'), primary_key=True)
     price_usd = sql.Column(sql.Float)
     market_cap_usd = sql.Column(sql.Float)
     volume_usd = sql.Column(sql.Float)
 
 
-class CoinMarketDataSchema(ma.SQLAlchemyAutoSchema):
-    Meta = schema_metadata(CoinMarketData)
+class CoinMarketHistorySchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(CoinMarketHistory)
