@@ -37,10 +37,9 @@ class Crawl(EntryPoint):
 
     def run(self, options):
         loop = asyncio.get_event_loop()
-        import pdb
-        pdb.set_trace()
-        loop.run_until_complete(
-            coingecko.Coins().get_coin('bitcoin-cash'))
+        coins = coingecko.Coins()
+        loop.create_task(coins.get_coins())
+        loop.run_forever()
 
     def build_parser(self, parser):
         pass

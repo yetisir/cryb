@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import asyncio
-import json
 
 import requests
 
@@ -16,8 +15,8 @@ class Crawler(ABC):
         cache.setup()
 
     async def request(self, url):
-        # if cache.has_url(url):
-        #     return worker.parse_response(requests.get(url))
+        if cache.has_url(url):
+            return worker.parse_response(requests.get(url))
 
         for destination in config.destinations:
             if destination.domain in url:
@@ -29,17 +28,20 @@ class Crawler(ABC):
                         'queue': destination.domain,
                     },
                     queue=destination.domain)
-                response = await loop.run_in_executor(None, func.get)
-                return self.parse_response(response)
+                try:
+                    return await loop.run_in_executor(None, func.get)
+                except Exception as e:
+                    print(e)
+                    return await self.request(url)
         else:
-            return self.parse_response(requests.get(url))
+            return worker.parse_response(requests.get(url))
 
-    @staticmethod
-    def parse_response(response):
-        try:
-            return response.json()
-        except json.JSONDecodeError:
-            if response.status_code == 200:
-                return response.text
-            else:
-                return response.status_code()
+    # @staticmethod
+    # def parse_response(response):
+    #     try:
+    #         return response.json()
+    #     except json.JSONDecodeError:
+    #         if response.status_code == 200:
+    #             return response.text
+    #         else:
+    #             return response.status_code()

@@ -11,6 +11,7 @@ from .. import base
 from . import tables
 
 tables.create_all()
+logging.basicConfig(level=logging.DEBUG)
 
 
 class CoinGeckoCrawler(base.Crawler):
@@ -27,21 +28,15 @@ class CoinGeckoCrawler(base.Crawler):
 class Coins(CoinGeckoCrawler):
     async def get_coins(self):
         coin_list = await self.coin_list()
-        # loop = asyncio.get_event_loop()
-        # for coin in coin_list:
-        #     loop.create_task(self.get_coin(coin))
-
-        await asyncio.gather(*map(self.get_coin, coin_list))
-
-        return coin_list
+        coins = map(self.get_coin, coin_list)
+        await asyncio.gather(*coins)
 
     async def get_coin(self, coin_id):
         if coin_id not in config.coin_ids:
             return
         coin = Coin(coin_id)
         await coin.get_info()
-        # loop = asyncio.get_event_loop()
-        # await coin.get_history()
+        await coin.get_history()
         return coin.info
 
     async def coin_list(self):
@@ -179,10 +174,10 @@ class CoinHistory(CoinGeckoCrawler):
             coin_snapshot = CoinHistorySnapshot(self.coin_id, date)
             await coin_snapshot.query()
 
-            if not coin_snapshot.valid_data and date != datetime.datetime.utcnow().date():
-                break
-            if self.smart_scan and date < max_date:
-                break
+            # if not coin_snapshot.valid_data and date != datetime.datetime.utcnow().date():
+            #     break
+            # if self.smart_scan and date < max_date:
+            #     break
             date -= date_increment
 
     def get_max_date(self, table):
