@@ -20,3 +20,6 @@ tests/test-reports
 
 # DB
 data/
+
+# Celery
+celerybeat-schedule
