@@ -13,10 +13,6 @@ def redis():
     )
 
 
-def rpc():
-    return 'rpc://'
-
-
 def redis_client():
     redis_config = config.connections.redis
     return redis_module.Redis(
@@ -25,6 +21,17 @@ def redis_client():
         db=redis_config.database_number,
         password=redis_config.password,
     )
+
+
+def memcached():
+    memcached_config = config.connections.memcached
+    return (
+        f'cache+memcached://{memcached_config.host}:{memcached_config.port}/'
+    )
+
+
+def rpc():
+    return 'rpc://'
 
 
 def rabbitmq():

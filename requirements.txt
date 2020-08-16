@@ -6,22 +6,25 @@
 #
 amqp==2.6.1               # via kombu
 billiard==3.6.3.0         # via celery
-celery==4.4.7             # via Cryb (setup.py)
+celery==4.4.7             # via cryb (setup.py)
 certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
-configurator[yaml]==2.6.0  # via Cryb (setup.py)
+configurator[yaml]==2.6.0  # via cryb (setup.py)
 idna==2.10                # via requests
 importlib-metadata==1.7.0  # via kombu
 kombu==4.6.11             # via celery
-psycopg2-binary==2.8.5    # via Cryb (setup.py)
-python-dotenv==0.14.0     # via Cryb (setup.py)
+marshmallow-sqlalchemy==0.23.0  # via cryb (setup.py)
+marshmallow==3.7.1        # via marshmallow-sqlalchemy
+psycopg2-binary==2.8.5    # via cryb (setup.py)
+pylibmc==1.6.1            # via cryb (setup.py)
+python-dotenv==0.14.0     # via cryb (setup.py)
 pytz==2020.1              # via celery
 pyyaml==5.3.1             # via configurator
-redis==3.5.3              # via Cryb (setup.py)
-requests-cache==0.5.2     # via Cryb (setup.py)
-requests==2.24.0          # via Cryb (setup.py), requests-cache
-sqlalchemy==1.3.18        # via Cryb (setup.py)
-stem==1.8.0               # via Cryb (setup.py)
+redis==3.5.3              # via cryb (setup.py)
+requests-cache==0.5.2     # via cryb (setup.py)
+requests==2.24.0          # via cryb (setup.py), requests-cache
+sqlalchemy==1.3.18        # via cryb (setup.py), marshmallow-sqlalchemy
+stem==1.8.0               # via cryb (setup.py)
 urllib3==1.25.10          # via requests
 vine==1.3.0               # via amqp, celery
 zipp==3.1.0               # via importlib-metadata

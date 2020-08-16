@@ -35,6 +35,10 @@ connections:
     password: ${POSTGRES_PASSWORD}
     database: ${POSTGRES_DATABASE}
 
+  memcached:
+    host: ${MEMCACHED_HOST}
+    port: ${MEMCACHED_PORT}
+
 targets:
   - domain: coingecko.com
     proxy: false
