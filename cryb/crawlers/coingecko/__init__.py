@@ -11,7 +11,6 @@ from .. import base
 from . import tables
 
 tables.create_all()
-logging.basicConfig(level=logging.DEBUG)
 
 
 class CoinGeckoCrawler(base.Crawler):
@@ -152,33 +151,43 @@ class Coin(CoinGeckoCrawler):
 
 class CoinHistory(CoinGeckoCrawler):
 
-    def __init__(self, coin_id, smart_scan=None, **kwargs):
+    def __init__(self, coin_id, **kwargs):
         super().__init__(**kwargs)
         self.coin_id = coin_id
-
-        if smart_scan is None:
-            smart_scan = config.smart_scan
-        self.smart_scan = smart_scan
 
     async def query(self):
 
         date = datetime.datetime.utcnow().date()
-        date_increment = datetime.timedelta(days=1)
+        # date_increment = datetime.timedelta(days=1)
 
-        max_date = min(
-            self.get_max_date(tables.CoinDeveloperData),
-            self.get_max_date(tables.CoinSocialData),
-        )
+        # max_date = min(
+        #     self.get_max_date(tables.CoinDeveloperData),
+        #     self.get_max_date(tables.CoinSocialData),
+        # )
 
-        while True:
+        date_span = date - config.timeseries_start
+        all_dates = [
+            date - datetime.timedelta(days=days) for
+            days in range(date_span.days)]
+
+        existing_dates = self.get_dates()
+
+        missing_dates = sorted(list(
+            set(all_dates) - set(existing_dates)), reverse=True)
+
+        for date in missing_dates:
             coin_snapshot = CoinHistorySnapshot(self.coin_id, date)
             await coin_snapshot.query()
 
-            # if not coin_snapshot.valid_data and date != datetime.datetime.utcnow().date():
-            #     break
-            # if self.smart_scan and date < max_date:
-            #     break
-            date -= date_increment
+    def get_dates(self):
+        dates = tables.db_session.query(tables.CoinDeveloperData.timestamp).join(
+            tables.CoinSocialData,
+            tables.CoinSocialData.date == tables.CoinDeveloperData.date
+        ).distinct().all()
+
+        return [
+            datetime.datetime.fromtimestamp(date[0]).date() for
+            date in dates]
 
     def get_max_date(self, table):
         max_timestamp = tables.db_session.query(
@@ -221,7 +230,6 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
         return self.date.strftime('%d-%m-%Y')
 
     async def query(self):
-
         url_parameters = self.api_parameters(
             id=self.coin_id,
             date=self.date_str,
@@ -230,9 +238,13 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
         url = f'{self.base_url}/coins/{self.coin_id}/history/{url_parameters}'
         self.raw_data = await self.request(url)
 
-        logging.info(
-            f'Downloaded {self.coin_id} data for {self.date_str} ...')
-        self.save()
+        if self.raw_data:
+            logging.info(
+                f'Downloaded {self.coin_id} data for {self.date_str} ...')
+            self.save()
+        else:
+            logging.info(
+                f'Error Downloading {self.coin_id} data for {self.date_str} ...')
 
     def save(self):
         self.save_social_data()

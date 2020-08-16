@@ -1,11 +1,14 @@
 from abc import ABC, abstractmethod
 import asyncio
+import logging
 
 import requests
 
 from .. import cache
 from .. import worker
 from ..config import config
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class Crawler(ABC):
@@ -30,8 +33,8 @@ class Crawler(ABC):
                     queue=destination.domain)
                 try:
                     return await loop.run_in_executor(None, func.get)
-                except Exception as e:
-                    print(e)
+                except Exception:
+                    logging.warn(f'Celery error for url "{url}". Retyring.')
                     return await self.request(url)
         else:
             return worker.parse_response(requests.get(url))

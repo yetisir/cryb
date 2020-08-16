@@ -10,7 +10,7 @@ coin_ids:
   - binancecoin
   - tezos
 
-smart_scan: false # TODO: replace
+timeseries_start: 2015-01-01
 
 max_retries: null
 
