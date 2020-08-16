@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 setup(
-    name='Cryb',
+    name='cryb',
     version='0.2.0',
     description='Cryptocurrency data scraper',
     url='https://github.com/yetisir/cryb',
