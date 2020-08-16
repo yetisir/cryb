@@ -34,7 +34,6 @@ class Crawler(ABC):
                 try:
                     return await loop.run_in_executor(None, func.get)
                 except Exception as e:
-                    print(e)
                     logging.warn(f'Celery error for url "{url}". Retyring.')
                     return await self.request(url)
         else:

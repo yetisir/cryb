@@ -17,6 +17,7 @@ setup(
         'requests>=2.24',
         'requests-cache>=0.5',
         'sqlalchemy>=1.3',
+        'marshmallow-sqlalchemy<=0.23',
         'psycopg2-binary>=2.8',
         'stem>=1.8',
     ],

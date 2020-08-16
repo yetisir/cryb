@@ -4,7 +4,6 @@ import datetime
 import asyncio
 
 from sqlalchemy import func, desc
-import pycoingecko
 
 from ...config import config
 from .. import base
@@ -14,7 +13,6 @@ tables.create_all()
 
 
 class CoinGeckoCrawler(base.Crawler):
-    api = pycoingecko.CoinGeckoAPI()
     base_url = 'https://api.coingecko.com/api/v3'
 
     def api_parameters(self, **parameters):
