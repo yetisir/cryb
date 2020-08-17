@@ -71,7 +71,7 @@ services:
     depends_on:
       - workers
     user: root
-    command: celery -A cryb.scheduler beat -l info
+    command: celery -A cryb.scheduler beat
 
   crawlers:
     build: .
@@ -98,6 +98,8 @@ services:
     image: grafana/grafana:7.1.3
     ports:
       - 3000:3000
+    # volumes:
+    #   - ./data/grafana:/var/lib/grafana
     depends_on:
       - postgres
     restart: always
