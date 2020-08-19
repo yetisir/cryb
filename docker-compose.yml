@@ -73,17 +73,17 @@ services:
     user: root
     command: celery -A cryb.scheduler beat
 
-  # crawlers:
-  #   build: .
-  #   env_file:
-  #     - .env
-  #   volumes:
-  #     - ./cryb:/app/cryb
-  #   restart: always
-  #   depends_on:
-  #     - workers
-  #   user: root
-  #   command: cryb crawl
+  crawlers:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./cryb:/app/cryb
+    restart: always
+    depends_on:
+      - workers
+    user: root
+    command: cryb crawl
 
   monitor:
     image: mher/flower
