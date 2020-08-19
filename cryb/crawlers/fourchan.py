@@ -4,6 +4,7 @@ import datetime
 import asyncio
 import html
 import logging
+import re
 
 from sqlalchemy import func, desc
 from bs4 import BeautifulSoup
@@ -193,7 +194,7 @@ class Thread(FourChanCrawler):
 
     @property
     def author(self):
-        return self.head['name']
+        return self.head['id']
 
     @property
     def head(self):
@@ -216,6 +217,8 @@ class Thread(FourChanCrawler):
 
 
 class Comment(FourChanCrawler):
+    parent_regex = re.compile('>>[0-9]{6,8}')
+
     def __init__(self, raw_data, thread_id):
         self.thread_id = thread_id
         self.raw_data = raw_data
@@ -231,9 +234,9 @@ class Comment(FourChanCrawler):
             'id': self.id,
             'thread_id': self.thread_id,
             'author': self.author,
-            'text': self.text,
             'created_on': self.created_on,
-            'parent_comment_id': None,
+            'parent_comment_id': self.parent,
+            'text': self.text[len(self.parent)+2:] if self.parent else self.text,
         }
 
     @property
@@ -242,7 +245,7 @@ class Comment(FourChanCrawler):
 
     @property
     def author(self):
-        return self.raw_data['name']
+        return self.raw_data['id']
 
     @property
     def text(self):
@@ -252,3 +255,11 @@ class Comment(FourChanCrawler):
     @property
     def created_on(self):
         return self.timestamp_to_iso(self.raw_data['time'])
+
+    @property
+    def parent(self):
+        match = self.parent_regex.search(self.text)
+        if match:
+            return match.group()[2:]
+        else:
+            return None
