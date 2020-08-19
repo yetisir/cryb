@@ -5,21 +5,13 @@ import asyncio
 
 from sqlalchemy import func, desc
 
-from ...config import config
-from .. import base
+from ..config import config
+from . import base
 from . import tables
-
-tables.create_all()
 
 
 class CoinGeckoCrawler(base.Crawler):
-    base_url = 'https://api.coingecko.com/api/v3'
-
-    def api_parameters(self, **parameters):
-        parameter_list = [
-            f'{parameter}={value}' for parameter, value in parameters.items()]
-        parameter_url = '&'.join(parameter_list)
-        return f'?{parameter_url}'.lower()
+    base_url = 'http://api.coingecko.com/api/v3'
 
 
 class Coins(CoinGeckoCrawler):
@@ -82,7 +74,7 @@ class Coin(CoinGeckoCrawler):
         self.save()
 
     def save(self):
-        schema = tables.CoinInfoSchema()
+        schema = tables.CoinSchema()
         tables.db_session.add(schema.load(self.info))
         tables.db_session.commit()
 
@@ -189,21 +181,10 @@ class CoinHistory(CoinGeckoCrawler):
             await coin_snapshot.query()
 
     def get_dates(self, table):
-        dates = tables.db_session.query(table.timestamp).filter(
+        dates = tables.db_session.query(table.date).filter(
             table.coin_id == self.coin_id).all()
 
-        return [
-            datetime.datetime.fromtimestamp(date[0]).date() for
-            date in dates]
-
-    def get_max_date(self, table):
-        max_timestamp = tables.db_session.query(
-            func.max(table.timestamp)).filter(table.coin_id == self.coin_id).scalar()
-
-        return (
-            datetime.datetime.fromtimestamp(max_timestamp).date() if max_timestamp
-            else datetime.datetime.fromtimestamp(0).date()
-        )
+        return [date[0] for date in dates]
 
 
 class CoinHistorySnapshot(CoinGeckoCrawler):
@@ -287,8 +268,8 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
         raw_social_data = self.raw_data.get('community_data')
         raw_public_data = self.raw_data.get('public_interest_stats')
         return {
-            'timestamp': self.timestamp,
-            'date': self.date_str,
+            # 'timestamp': self.timestamp,
+            'date': self.date.isoformat(),
             'coin_id': self.coin_id,
             'facebook_likes': raw_social_data['facebook_likes'],
             'twitter_followers': raw_social_data['twitter_followers'],
@@ -303,8 +284,8 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
     def developer_data(self):
         raw_developer_data = self.raw_data.get('developer_data')
         return {
-            'timestamp': self.timestamp,
-            'date': self.date_str,
+            # 'timestamp': self.timestamp,
+            'date': self.date.isoformat(),
             'coin_id': self.coin_id,
             'forks': raw_developer_data['forks'],
             'stars': raw_developer_data['stars'],
@@ -322,8 +303,8 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
     def market_data(self):
         raw_market_data = self.raw_data.get('market_data')
         return {
-            'timestamp': self.timestamp,
-            'date': self.date_str,
+            # 'timestamp': self.timestamp,
+            'date': self.date.isoformat(),
             'coin_id': self.coin_id,
             'price_usd': raw_market_data['current_price']['usd'],
             'market_cap_usd': raw_market_data['market_cap']['usd'],

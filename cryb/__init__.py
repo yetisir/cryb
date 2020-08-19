@@ -18,7 +18,7 @@ def get_task_queues():
     return task_queues
 
 
-cache.setup()
+# cache.setup()
 
 celery = Celery(
     'cryb', broker=connections.rabbitmq(), backend=connections.memcached())

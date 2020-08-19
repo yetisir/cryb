@@ -10,8 +10,9 @@ def setup():
 
 
 def has_url(url):
-    cache = requests_cache.get_cache()
-    if not cache:
+    try:
+        cache = requests_cache.get_cache()
+    except AttributeError:
         return False
 
     return cache.has_url(url)

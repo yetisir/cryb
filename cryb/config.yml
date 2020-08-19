@@ -1,18 +1,7 @@
-coin_ids:
-  - bitcoin
-  - ethereum
-  - ripple
-  - tether
-  - bitcoin-cash
-  - bitcoin-cash-sv
-  - litecoin
-  - eos
-  - binancecoin
-  - tezos
-
+# parameters to be recategorized
 timeseries_start: 2015-01-01
-
-max_retries: null
+fourchan_boards:
+  - biz
 
 connections:
   redis:
@@ -44,27 +33,29 @@ targets:
     proxy: false
     cache: true
     concurrency: 10
+    max_retries: 10
     rate_limit:
       requests: 60
       timeframe: 60
-  - domain: archived.moe
-    proxy: true
+  - domain: 4cdn.org
+    proxy: false
     cache: false
     concurrency: 10
+    max_retries: 10
     rate_limit:
-      requests: 100
+      requests: 60
       timeframe: 60
-  - domain: pushshift.io
-    proxy: true
-    cache: false
-    concurrency: 10
-    rate_limit:
-      requests: 100
-      timeframe: 60
-  - domain: reddit.com
-    proxy: true
-    cache: false
-    concurrency: 10
-    rate_limit:
-      requests: 100
-      timeframe: 60
+  # - domain: pushshift.io
+  #   proxy: true
+  #   cache: false
+  #   concurrency: 10
+  #   rate_limit:
+  #     requests: 100
+  #     timeframe: 60
+  # - domain: reddit.com
+  #   proxy: true
+  #   cache: false
+  #   concurrency: 10
+  #   rate_limit:
+  #     requests: 100
+  #     timeframe: 60

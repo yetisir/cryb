@@ -10,10 +10,7 @@ from .config import config
 
 
 @celery.task(bind=True)
-def request(self, url, queue=None, use_cache=True, max_retries=None):
-    if use_cache:
-        cache.setup()
-
+def request(self, url, queue=None):
     with celery.connection_for_read() as connection:
         token = None
         while token is None:
@@ -30,10 +27,7 @@ def issue_token():
 
 
 def parse_response(response):
-    try:
-        return response.json()
-    except json.JSONDecodeError:
-        if response.status_code == 200:
-            return response.text
-        else:
-            return response.status_code
+    if response.status_code == 200:
+        return response.text
+    else:
+        return response.status_code

@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 
 import marshmallow_sqlalchemy as ma
 
-from ... import connections
+from .. import connections
 
 
 db_engine = sql.create_engine(connections.postgresql())
@@ -27,8 +27,10 @@ def schema_metadata(cls):
         include_relationships = True
     return Meta
 
+# Coin Gecko Tables
 
-class CoinInfo(Base):
+
+class Coin(Base):
     __tablename__ = 'coin_info'
 
     id = sql.Column(sql.String(), primary_key=True)
@@ -44,15 +46,14 @@ class CoinInfo(Base):
     telegram = sql.Column(sql.String())
 
 
-class CoinInfoSchema(ma.SQLAlchemyAutoSchema):
-    Meta = schema_metadata(CoinInfo)
+class CoinSchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(Coin)
 
 
 class CoinSocialHistory(Base):
     __tablename__ = 'coin_social_history'
 
-    timestamp = sql.Column(sql.Integer(), primary_key=True)
-    date = sql.Column(sql.String())
+    date = sql.Column(sql.Date(), primary_key=True)
     coin_id = sql.Column(sql.String(), sql.ForeignKey(
         'coin_info.id'), primary_key=True)
     facebook_likes = sql.Column(sql.Integer())
@@ -71,8 +72,7 @@ class CoinSocialHistorySchema(ma.SQLAlchemyAutoSchema):
 class CoinDeveloperHistory(Base):
     __tablename__ = 'coin_developer_history'
 
-    timestamp = sql.Column(sql.Integer(), primary_key=True)
-    date = sql.Column(sql.String())
+    date = sql.Column(sql.Date(), primary_key=True)
     coin_id = sql.Column(sql.String(), sql.ForeignKey(
         'coin_info.id'), primary_key=True)
     forks = sql.Column(sql.Integer())
@@ -94,8 +94,7 @@ class CoinDeveloperHistorySchema(ma.SQLAlchemyAutoSchema):
 class CoinMarketHistory(Base):
     __tablename__ = 'coin_market_history'
 
-    timestamp = sql.Column(sql.Integer(), primary_key=True)
-    date = sql.Column(sql.String())
+    date = sql.Column(sql.Date(), primary_key=True)
     coin_id = sql.Column(sql.String(), sql.ForeignKey(
         'coin_info.id'), primary_key=True)
     price_usd = sql.Column(sql.Float)
@@ -105,3 +104,59 @@ class CoinMarketHistory(Base):
 
 class CoinMarketHistorySchema(ma.SQLAlchemyAutoSchema):
     Meta = schema_metadata(CoinMarketHistory)
+
+
+# Forum Tables
+
+# class Forum(Base):
+#     __tablename__ = 'forum'
+#     id = sql.Column(sql.String(), primary_key=True)
+
+
+# class ForumSchema(ma.SQLAlchemyAutoSchema):
+#     Meta = schema_metadata(Forum)
+
+
+class Board(Base):
+    __tablename__ = 'board'
+
+    id = sql.Column(sql.String(), primary_key=True)
+    name = sql.Column(sql.String(), nullable=False)
+    description = sql.Column(sql.String())
+
+
+class BoardSchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(Board)
+
+
+class Thread(Base):
+    __tablename__ = 'thread'
+
+    id = sql.Column(sql.String(), primary_key=True)
+    board_id = sql.Column(sql.String(), sql.ForeignKey('board.id'))
+    # board_id = sql.Column(sql.String(), nullable=False)
+    author = sql.Column(sql.String(), nullable=False)
+    title = sql.Column(sql.String(), nullable=False)
+    text = sql.Column(sql.String(), nullable=False)
+    created_on = sql.Column(sql.DateTime, nullable=False)
+    updated_on = sql.Column(sql.DateTime, nullable=False)
+    active = sql.Column(sql.Boolean, nullable=False)
+
+
+class ThreadSchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(Thread)
+
+
+class Comment(Base):
+    __tablename__ = 'comment'
+
+    id = sql.Column(sql.String(), primary_key=True)
+    thread_id = sql.Column(sql.String(), sql.ForeignKey('thread.id'))
+    author = sql.Column(sql.String(), nullable=False)
+    text = sql.Column(sql.String(), nullable=False)
+    created_on = sql.Column(sql.DateTime, nullable=False)
+    parent_comment_id = sql.Column(sql.String())
+
+
+class CommentSchema(ma.SQLAlchemyAutoSchema):
+    Meta = schema_metadata(Comment)
