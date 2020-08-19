@@ -7,24 +7,16 @@ logger = get_task_logger(__name__)
 
 
 @celery.on_after_configure.connect
-def setup_periodic_tasks(**kwargs):
-
-    celery.add_periodic_task(
-        1,
-        worker.issue_token.signature(
-            queue=f'coingecko.com_tokens'),
-    )
-
-    # # generating auto issuing of tokens for all lmited groups
-    # for destination in config.destinations:
-    #     logger.info(destination)
-    #     if destination.rate_limit:
-    #         interval = (
-    #             destination.rate_limit.timeframe /
-    #             destination.rate_limit.requests
-    #         )
-    #         celery.add_periodic_task(
-    #             interval,
-    #             worker.issue_token.signature(
-    #                 queue=f'{destination.domain}_tokens'),
-    #         )
+def setup_periodic_tasks(sender, **kwargs):
+    for target in config.targets:
+        if target.rate_limit:
+            interval = (
+                target.rate_limit.timeframe /
+                target.rate_limit.requests
+            )
+            sender.add_periodic_task(
+                interval,
+                worker.issue_token.signature(
+                    queue=f'{target.domain}_tokens'),
+                name=target.domain,
+            )

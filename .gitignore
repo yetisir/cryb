@@ -15,8 +15,8 @@ tests/test-reports
 # SQLite
 *.sqlite
 
-# Env
-.env
-
 # DB
 data/
+
+# Celery
+celerybeat-schedule

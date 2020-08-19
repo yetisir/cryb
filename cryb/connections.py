@@ -23,6 +23,17 @@ def redis_client():
     )
 
 
+def memcached():
+    memcached_config = config.connections.memcached
+    return (
+        f'cache+memcached://{memcached_config.host}:{memcached_config.port}/'
+    )
+
+
+def rpc():
+    return 'rpc://'
+
+
 def rabbitmq():
     rabbitmq_config = config.connections.rabbitmq
     return (
