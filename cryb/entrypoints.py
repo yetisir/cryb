@@ -34,18 +34,18 @@ class EntryPoint(ABC):
 class Crawl(EntryPoint):
     name = 'crawl'
     description = 'Starts cryb crawler processes'
+    crawlers = {
+        'fourchan': fourchan.Boards,
+        'coingecko': coingecko.Coins,
+    }
 
     def run(self, options):
-        print('Starting')
         loop = asyncio.get_event_loop()
-        # coingecko_coins = coingecko.Coins()
-        fourchan_boards = fourchan.Boards()
-        # loop.run_until_complete(coingecko_coins.get())
-        loop.run_until_complete(fourchan_boards.get())
-        exit()
+        loop.run_until_complete(self.crawlers.get(options.crawler)().get())
 
     def build_parser(self, parser):
-        pass
+        parser.add_argument(
+            '--crawler', '-c', choices=['fourchan', 'coingecko'])
 
 
 def initialize():

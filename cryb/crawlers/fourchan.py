@@ -216,7 +216,7 @@ class Thread(FourChanCrawler):
 
 
 class Comment(FourChanCrawler):
-    parent_regex = re.compile('>>[0-9]{6,8}')
+    parent_regex = re.compile('>>[0-9]{7,8}')
 
     def __init__(self, raw_data, thread_id):
         self.thread_id = thread_id

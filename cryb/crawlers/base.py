@@ -32,7 +32,11 @@ class Crawler(ABC):
             return 404
 
         if target and target.cache and cache.has_url(url):
-            return self.parse_response(requests.get(url))
+            response = requests.get(url)
+            if response.status_code == 200:
+                return self.parse_response(response.text)
+            else:
+                return response.status_code
 
         loop = asyncio.get_event_loop()
         func = worker.request.apply_async(
@@ -64,7 +68,6 @@ class Crawler(ABC):
         return f'?{parameter_url}'.lower()
 
     def parse_response(self, string):
-
         try:
             return json.loads(string)
         except (TypeError, json.decoder.JSONDecodeError):
