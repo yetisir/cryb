@@ -55,16 +55,6 @@ class Board(FourChanCrawler):
         self.name = name
         self.description = description
 
-    async def update_thread_status(self):
-        archived_threads = set(await self.archive_list())
-        active_threads = set(self.get_active_threads().keys())
-
-        update_threads = set.intersection(archived_threads, active_threads)
-        # tables.db_session.query(tables.Thread).filter(tables.Thread.id == '21630117').update(
-        tables.db_session.query(tables.Thread).filter(tables.Thread.id.in_(update_threads)).update(
-            {tables.Thread.active: False}, synchronize_session='fetch')
-        tables.db_session.commit()
-
     @property
     def data(self):
         return {
@@ -73,9 +63,14 @@ class Board(FourChanCrawler):
             'description': self.description,
         }
 
-    def save(self):
-        schema = tables.BoardSchema()
-        tables.db_session.add(schema.load(self.data))
+    async def update_thread_status(self):
+        archived_threads = set(await self.archive_list())
+        active_threads = set(self.get_active_threads().keys())
+
+        update_threads = set.intersection(archived_threads, active_threads)
+        # tables.db_session.query(tables.Thread).filter(tables.Thread.id == '21630117').update(
+        tables.db_session.query(tables.Thread).filter(tables.Thread.id.in_(update_threads)).update(
+            {tables.Thread.active: False}, synchronize_session='fetch')
         tables.db_session.commit()
 
     async def get(self):
@@ -105,7 +100,6 @@ class Board(FourChanCrawler):
         await self.get_threads(threads, active=True)
 
     async def get_archive(self):
-
         for target in config.targets:
             if target.domain in self.base_url:
                 chunksize = target.concurrency
@@ -139,6 +133,11 @@ class Board(FourChanCrawler):
             tables.Thread.active == True).all()
         return {thread[0]: thread[1] for thread in threads}
 
+    def save(self):
+        schema = tables.BoardSchema()
+        tables.db_session.add(schema.load(self.data))
+        tables.db_session.commit()
+
 
 class Thread(FourChanCrawler):
     def __init__(self, id, board_id, active):
@@ -146,20 +145,6 @@ class Thread(FourChanCrawler):
         self.board_id = board_id
 
         self.active = active
-
-    async def get(self):
-        url = f'{self.base_url}/{self.board_id}/thread/{self.id}.json'
-        self.raw_data = await self.request(url)
-        if self.raw_data == 404:
-            return
-        if 'posts' not in self.raw_data.keys():
-            return
-        self.save()
-        for comment in self.comments:
-            Comment(comment, self.id).save()
-
-        active_string = 'active' if self.active else 'archived'
-        logging.info(f'Downloaded 4Chan thread {self.id} ({active_string})')
 
     @property
     def updated_on(self):
@@ -210,6 +195,20 @@ class Thread(FourChanCrawler):
         text = self.head.get('com')
         return self.normalize_text(text) if text else ''
 
+    async def get(self):
+        url = f'{self.base_url}/{self.board_id}/thread/{self.id}.json'
+        self.raw_data = await self.request(url)
+        if self.raw_data == 404:
+            return
+        if 'posts' not in self.raw_data.keys():
+            return
+        self.save()
+        for comment in self.comments:
+            Comment(comment, self.id).save()
+
+        active_string = 'active' if self.active else 'archived'
+        logging.info(f'Downloaded 4Chan thread {self.id} ({active_string})')
+
     def save(self):
         schema = tables.ThreadSchema()
         tables.db_session.add(schema.load(self.data))
@@ -222,11 +221,6 @@ class Comment(FourChanCrawler):
     def __init__(self, raw_data, thread_id):
         self.thread_id = thread_id
         self.raw_data = raw_data
-
-    def save(self):
-        schema = tables.CommentSchema()
-        tables.db_session.add(schema.load(self.data))
-        tables.db_session.commit()
 
     @property
     def data(self):
@@ -263,3 +257,8 @@ class Comment(FourChanCrawler):
             return match.group()[2:]
         else:
             return None
+
+    def save(self):
+        schema = tables.CommentSchema()
+        tables.db_session.add(schema.load(self.data))
+        tables.db_session.commit()
