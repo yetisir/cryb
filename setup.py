@@ -20,7 +20,8 @@ setup(
         'marshmallow-sqlalchemy<=0.23',
         'psycopg2-binary>=2.8',
         'stem>=1.8',
-        'pylibmc>=1.6'
+        'pylibmc>=1.6',
+        'beautifulsoup4>=4.9',
     ],
     # extras_require={
     #     'dev': [
