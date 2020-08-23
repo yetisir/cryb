@@ -18,7 +18,7 @@ class Crawler(ABC):
     def __init__(self):
         super().__init__()
         cache.setup()
-        tables.create_all()
+        tables.Database.create_all()
 
     async def request(self, url, attempt=0):
         for target in config.targets:
