@@ -117,13 +117,12 @@ services:
       - rabbitmq
     restart: always
     command: --broker=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:${RABBITMQ_PORT}/${RABBITMQ_VIRTUALHOST}
-
-  grafana:
-    image: grafana/grafana:7.1.3
-    ports:
-      - 3000:3000
-    # volumes:
-    #   - ./data/grafana:/var/lib/grafana
-    depends_on:
-      - postgres
-    restart: always
+  # grafana:
+  #   image: grafana/grafana:7.1.3
+  #   ports:
+  #     - 3000:3000
+  #   # volumes:
+  #   #   - ./data/grafana:/var/lib/grafana
+  #   depends_on:
+  #     - postgres
+  #   restart: always
