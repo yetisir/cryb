@@ -22,6 +22,7 @@ setup(
         'stem>=1.8',
         'pylibmc>=1.6',
         'beautifulsoup4>=4.9',
+        'lxml>=4.5',
     ],
     # extras_require={
     #     'dev': [
