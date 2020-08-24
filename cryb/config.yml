@@ -61,5 +61,5 @@ targets:
     concurrency: 10
     max_retries: 10
     rate_limit:
-      requests: 30
+      requests: 60
       timeframe: 60

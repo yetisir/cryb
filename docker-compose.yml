@@ -59,7 +59,7 @@ services:
       - redis
       # - tor
       - postgres
-    command: celery -A cryb.worker worker -l info -c 10 -Q 4cdn.org,coingecko.com -O fair
+    command: celery -A cryb.worker worker -l info -c 10 -Q 4cdn.org,coingecko.com,reddit.com -O fair
 
   scheduler:
     build: .
@@ -73,29 +73,41 @@ services:
     user: root
     command: celery -A cryb.scheduler beat
 
-  # fourchan_crawler:
-  #   build: .
-  #   env_file:
-  #     - .env
-  #   volumes:
-  #     - ./cryb:/app/cryb
-  #   restart: always
-  #   depends_on:
-  #     - workers
-  #   user: root
-  #   command: cryb crawl -c fourchan
+  fourchan_crawler:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./cryb:/app/cryb
+    restart: always
+    depends_on:
+      - workers
+    user: root
+    command: cryb crawl -c fourchan
 
-  # coingecko_crawler:
-  #   build: .
-  #   env_file:
-  #     - .env
-  #   volumes:
-  #     - ./cryb:/app/cryb
-  #   restart: always
-  #   depends_on:
-  #     - workers
-  #   user: root
-  #   command: cryb crawl -c coingecko
+  coingecko_crawler:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./cryb:/app/cryb
+    restart: always
+    depends_on:
+      - workers
+    user: root
+    command: cryb crawl -c coingecko
+
+  reddit_crawler:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./cryb:/app/cryb
+    restart: always
+    depends_on:
+      - workers
+    user: root
+    command: cryb crawl -c reddit
 
   monitor:
     image: mher/flower

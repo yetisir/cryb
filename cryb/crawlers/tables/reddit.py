@@ -26,8 +26,7 @@ class Thread(Database.Table):
     title = sql.Column(sql.String(), nullable=False)
     text = sql.Column(sql.String(), nullable=False)
     created_on = sql.Column(sql.DateTime, nullable=False)
-    updated_on = sql.Column(sql.DateTime, nullable=False)
-    active = sql.Column(sql.Boolean, nullable=False)
+    comments = sql.Column(sql.Integer, nullable=False)
 
 
 class ThreadSchema(ma.SQLAlchemyAutoSchema):

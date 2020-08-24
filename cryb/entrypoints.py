@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import asyncio
 
 from . import worker
-from .crawlers import coingecko, fourchan
+from .crawlers import coingecko, fourchan, reddit
 
 
 class EntryPoint(ABC):
@@ -36,6 +36,7 @@ class Crawl(EntryPoint):
     description = 'Starts cryb crawler processes'
     crawlers = {
         'fourchan': fourchan.Boards,
+        'reddit': reddit.Boards,
         'coingecko': coingecko.Coins,
     }
 
@@ -45,7 +46,7 @@ class Crawl(EntryPoint):
 
     def build_parser(self, parser):
         parser.add_argument(
-            '--crawler', '-c', choices=['fourchan', 'coingecko'])
+            '--crawler', '-c', choices=self.crawlers.keys())
 
 
 def initialize():

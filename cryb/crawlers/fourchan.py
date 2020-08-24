@@ -17,12 +17,6 @@ class FourChanCrawler(base.Crawler):
     base_url = 'http://a.4cdn.org/'
     forum_id = 'fourchan'
 
-    def normalize_text(self, text):
-        return BeautifulSoup(text).text
-
-    def timestamp_to_iso(self, timestamp):
-        return datetime.datetime.utcfromtimestamp(timestamp).isoformat()
-
 
 class Boards(FourChanCrawler):
     async def get(self):
