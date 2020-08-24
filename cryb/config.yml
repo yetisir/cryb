@@ -2,6 +2,8 @@
 timeseries_start: 2015-01-01
 fourchan_boards:
   - biz
+reddit_boards:
+  - bitcoin
 
 connections:
   redis:
@@ -45,17 +47,19 @@ targets:
     rate_limit:
       requests: 60
       timeframe: 60
-  # - domain: pushshift.io
-  #   proxy: true
-  #   cache: false
-  #   concurrency: 10
-  #   rate_limit:
-  #     requests: 100
-  #     timeframe: 60
-  # - domain: reddit.com
-  #   proxy: true
-  #   cache: false
-  #   concurrency: 10
-  #   rate_limit:
-  #     requests: 100
-  #     timeframe: 60
+  - domain: pushshift.io
+    proxy: true
+    cache: false
+    concurrency: 10
+    max_retries: 10
+    rate_limit:
+      requests: 60
+      timeframe: 60
+  - domain: reddit.com
+    proxy: true
+    cache: false
+    concurrency: 10
+    max_retries: 10
+    rate_limit:
+      requests: 60
+      timeframe: 60

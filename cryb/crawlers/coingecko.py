@@ -6,8 +6,7 @@ import asyncio
 from sqlalchemy import func, desc
 
 from ..config import config
-from . import base
-from . import tables
+from . import base, tables
 
 
 class CoinGeckoCrawler(base.Crawler):
@@ -74,9 +73,9 @@ class Coin(CoinGeckoCrawler):
         self.save()
 
     def save(self):
-        schema = tables.CoinSchema()
-        tables.db_session.add(schema.load(self.info))
-        tables.db_session.commit()
+        schema = tables.coingecko.CoinSchema()
+        tables.Database.session.add(schema.load(self.info))
+        tables.Database.session.commit()
 
     @property
     def info(self):
@@ -168,9 +167,9 @@ class CoinHistory(CoinGeckoCrawler):
             days in range(date_span.days)]
 
         existing_dates = set.intersection(
-            set(self.get_dates(tables.CoinSocialHistory)),
-            set(self.get_dates(tables.CoinDeveloperHistory)),
-            set(self.get_dates(tables.CoinMarketHistory)),
+            set(self.get_dates(tables.coingecko.SocialHistory)),
+            set(self.get_dates(tables.coingecko.DeveloperHistory)),
+            set(self.get_dates(tables.coingecko.MarketHistory)),
         )
 
         missing_dates = sorted(list(
@@ -181,7 +180,7 @@ class CoinHistory(CoinGeckoCrawler):
             await coin_snapshot.query()
 
     def get_dates(self, table):
-        dates = tables.db_session.query(table.date).filter(
+        dates = tables.Database.session.query(table.date).filter(
             table.coin_id == self.coin_id).all()
 
         return [date[0] for date in dates]
@@ -243,25 +242,25 @@ class CoinHistorySnapshot(CoinGeckoCrawler):
         if 'community_data' not in self.raw_data.keys():
             self.valid_social_data = False
             return
-        schema = tables.CoinSocialHistorySchema()
-        tables.db_session.add(schema.load(self.social_data))
-        tables.db_session.commit()
+        schema = tables.coingecko.SocialHistorySchema()
+        tables.Database.session.add(schema.load(self.social_data))
+        tables.Database.session.commit()
 
     def save_developer_data(self):
         if 'developer_data' not in self.raw_data.keys():
             self.valid_developer_data = False
             return
-        schema = tables.CoinDeveloperHistorySchema()
-        tables.db_session.add(schema.load(self.developer_data))
-        tables.db_session.commit()
+        schema = tables.coingecko.DeveloperHistorySchema()
+        tables.Database.session.add(schema.load(self.developer_data))
+        tables.Database.session.commit()
 
     def save_market_data(self):
         if 'market_data' not in self.raw_data.keys():
             self.valid_market_data = False
             return
-        schema = tables.CoinMarketHistorySchema()
-        tables.db_session.add(schema.load(self.market_data))
-        tables.db_session.commit()
+        schema = tables.coingecko.MarketHistorySchema()
+        tables.Database.session.add(schema.load(self.market_data))
+        tables.Database.session.commit()
 
     @property
     def social_data(self):

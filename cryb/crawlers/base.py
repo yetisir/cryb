@@ -2,8 +2,10 @@ from abc import ABC, abstractmethod
 import asyncio
 import logging
 import json
+import datetime
 
 import requests
+from bs4 import BeautifulSoup
 
 from . import tables
 from .. import cache
@@ -18,7 +20,7 @@ class Crawler(ABC):
     def __init__(self):
         super().__init__()
         cache.setup()
-        tables.create_all()
+        tables.Database.create_all()
 
     async def request(self, url, attempt=0):
         for target in config.targets:
@@ -72,3 +74,9 @@ class Crawler(ABC):
             return json.loads(string)
         except (TypeError, json.decoder.JSONDecodeError):
             return string
+
+    def normalize_text(self, text):
+        return BeautifulSoup(text, features='lxml').text
+
+    def timestamp_to_iso(self, timestamp):
+        return datetime.datetime.utcfromtimestamp(timestamp).isoformat()

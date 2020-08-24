@@ -4,8 +4,6 @@ from sqlalchemy.orm import relationship, sessionmaker
 
 import marshmallow_sqlalchemy as ma
 
-from .. import connections
-
 
 db_engine = sql.create_engine(connections.postgresql())
 Session = sessionmaker(bind=db_engine)

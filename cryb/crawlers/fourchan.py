@@ -10,19 +10,12 @@ from sqlalchemy import func, desc
 from bs4 import BeautifulSoup
 
 from ..config import config
-from . import base
-from . import tables
+from . import base, tables
 
 
 class FourChanCrawler(base.Crawler):
     base_url = 'http://a.4cdn.org/'
     forum_id = 'fourchan'
-
-    def normalize_text(self, text):
-        return BeautifulSoup(text).text
-
-    def timestamp_to_iso(self, timestamp):
-        return datetime.datetime.utcfromtimestamp(timestamp).isoformat()
 
 
 class Boards(FourChanCrawler):
@@ -68,10 +61,10 @@ class Board(FourChanCrawler):
         active_threads = set(self.get_active_threads().keys())
 
         update_threads = set.intersection(archived_threads, active_threads)
-        # tables.db_session.query(tables.Thread).filter(tables.Thread.id == '21630117').update(
-        tables.db_session.query(tables.Thread).filter(tables.Thread.id.in_(update_threads)).update(
-            {tables.Thread.active: False}, synchronize_session='fetch')
-        tables.db_session.commit()
+        # tables.Database.session.query(tables.Thread).filter(tables.Thread.id == '21630117').update(
+        tables.Database.session.query(tables.fourchan.Thread).filter(tables.fourchan.Thread.id.in_(update_threads)).update(
+            {tables.fourchan.Thread.active: False}, synchronize_session='fetch')
+        tables.Database.session.commit()
 
     async def get(self):
         await self.update_thread_status()
@@ -124,19 +117,19 @@ class Board(FourChanCrawler):
         return [str(thread) for thread in archive]
 
     def get_archived_threads(self):
-        threads = tables.db_session.query(tables.Thread.id).filter(
-            tables.Thread.active == False).all()
+        threads = tables.Database.session.query(tables.fourchan.Thread.id).filter(
+            tables.fourchan.Thread.active == False).all()
         return [thread[0] for thread in threads]
 
     def get_active_threads(self):
-        threads = tables.db_session.query(tables.Thread.id, tables.Thread.updated_on).filter(
-            tables.Thread.active == True).all()
+        threads = tables.Database.session.query(tables.fourchan.Thread.id, tables.fourchan.Thread.updated_on).filter(
+            tables.fourchan.Thread.active == True).all()
         return {thread[0]: thread[1] for thread in threads}
 
     def save(self):
-        schema = tables.BoardSchema()
-        tables.db_session.add(schema.load(self.data))
-        tables.db_session.commit()
+        schema = tables.fourchan.BoardSchema()
+        tables.Database.session.add(schema.load(self.data))
+        tables.Database.session.commit()
 
 
 class Thread(FourChanCrawler):
@@ -210,9 +203,9 @@ class Thread(FourChanCrawler):
         logging.info(f'Downloaded 4Chan thread {self.id} ({active_string})')
 
     def save(self):
-        schema = tables.ThreadSchema()
-        tables.db_session.add(schema.load(self.data))
-        tables.db_session.commit()
+        schema = tables.fourchan.ThreadSchema()
+        tables.Database.session.add(schema.load(self.data))
+        tables.Database.session.commit()
 
 
 class Comment(FourChanCrawler):
@@ -259,6 +252,6 @@ class Comment(FourChanCrawler):
             return None
 
     def save(self):
-        schema = tables.CommentSchema()
-        tables.db_session.add(schema.load(self.data))
-        tables.db_session.commit()
+        schema = tables.fourchan.CommentSchema()
+        tables.Database.session.add(schema.load(self.data))
+        tables.Database.session.commit()

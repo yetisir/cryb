@@ -1,12 +1,12 @@
 version: "3"
 
 services:
-  tor:
-    image: osminogin/tor-simple
-    restart: always
-    ports:
-      - 127.0.0.1:9050:9050
-      - 127.0.0.1:9150:9150
+  # tor:
+  #   image: osminogin/tor-simple
+  #   restart: always
+  #   ports:
+  #     - 127.0.0.1:9050:9050
+  #     - 127.0.0.1:9150:9150
 
   redis:
     image: redis:6.0-buster
@@ -57,9 +57,9 @@ services:
     depends_on:
       - rabbitmq
       - redis
-      - tor
+      # - tor
       - postgres
-    command: celery -A cryb.worker worker -l info -c 10 -Q 4cdn.org,coingecko.com -O fair
+    command: celery -A cryb.worker worker -l info -c 10 -Q 4cdn.org,coingecko.com,reddit.com -O fair
 
   scheduler:
     build: .
@@ -97,6 +97,18 @@ services:
     user: root
     command: cryb crawl -c coingecko
 
+  reddit_crawler:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./cryb:/app/cryb
+    restart: always
+    depends_on:
+      - workers
+    user: root
+    command: cryb crawl -c reddit
+
   monitor:
     image: mher/flower
     ports:
@@ -105,13 +117,12 @@ services:
       - rabbitmq
     restart: always
     command: --broker=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:${RABBITMQ_PORT}/${RABBITMQ_VIRTUALHOST}
-
-  grafana:
-    image: grafana/grafana:7.1.3
-    ports:
-      - 3000:3000
-    # volumes:
-    #   - ./data/grafana:/var/lib/grafana
-    depends_on:
-      - postgres
-    restart: always
+  # grafana:
+  #   image: grafana/grafana:7.1.3
+  #   ports:
+  #     - 3000:3000
+  #   # volumes:
+  #   #   - ./data/grafana:/var/lib/grafana
+  #   depends_on:
+  #     - postgres
+  #   restart: always

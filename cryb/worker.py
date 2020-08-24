@@ -18,7 +18,12 @@ def request(self, url, queue=None):
                 f'{queue}_tokens', no_ack=True)
 
     return parse_response(
-        requests.get(url, timeout=(5.0, 30.0)))
+        requests.get(
+            url,
+            timeout=(5.0, 30.0),
+            headers={'User-agent': 'cryb 0.2'},
+        )
+    )
 
 
 @celery.task
