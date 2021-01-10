@@ -14,7 +14,7 @@ configurator[yaml]==2.6.0  # via cryb (setup.py)
 idna==2.10                # via requests
 importlib-metadata==1.7.0  # via kombu
 kombu==4.6.11             # via celery
-lxml==4.5.2               # via cryb (setup.py)
+lxml==4.6.2               # via cryb (setup.py)
 marshmallow-sqlalchemy==0.23.0  # via cryb (setup.py)
 marshmallow==3.7.1        # via marshmallow-sqlalchemy
 psycopg2-binary==2.8.5    # via cryb (setup.py)
