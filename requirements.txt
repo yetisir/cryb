@@ -7,7 +7,7 @@
 amqp==2.6.1               # via kombu
 beautifulsoup4==4.9.1     # via cryb (setup.py)
 billiard==3.6.3.0         # via celery
-celery==4.4.7             # via cryb (setup.py)
+celery==5.2.2             # via cryb (setup.py)
 certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
 configurator[yaml]==2.6.0  # via cryb (setup.py)
